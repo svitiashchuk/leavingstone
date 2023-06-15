@@ -1,0 +1,59 @@
+<div class="row">
+    <div class="col">
+        <h3>Report for {{ .Nav.Now.Month }}</h3>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Previous" hx-trigger="click"
+                        hx-target="#tracker-container" hx-swap="innerHTML"
+                        hx-get="/tracker?year={{ .Nav.Prev.Year }}&month={{ .Nav.Prev.Month }}">
+                        <span aria-hidden="true">&laquo; {{ .Nav.Prev.Month }}-{{ .Nav.Prev.Year }}</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="#">
+                        {{ .Nav.Now.Month }}-{{ .Nav.Now.Year }}
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="#" aria-label="Next" hx-trigger="click" hx-target="#tracker-container"
+                        hx-swap="innerHTML" hx-get="/tracker?year={{ .Nav.Next.Year }}&month={{ .Nav.Next.Month }}">
+                        <span aria-hidden="true">{{ .Nav.Next.Month }}-{{ .Nav.Next.Year }} &raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+<div class="row">
+    <table class="table-bordered">
+        <thead>
+            <th>Username</th>
+            {{ range .Days }}
+            <th>{{ .Format "02.01" }}</th>
+            {{ end }}
+        </thead>
+        <tbody>
+            {{ range .Users }}
+            <tr>
+                <td>{{ .Name }}</td>
+                {{ range .UserDays }}
+                {{if eq .Type "SickDay" }}
+                <td class="bg-warning text-dark"></td>
+                {{ else if eq .Type "DayOff" }}
+                <td class="bg-danger"></td>
+                {{ else if eq .Type "Weekend" }}
+                <td class="bg-secondary"></td>
+                {{ else if eq .Type "BankHoliday" }}
+                <td class="bg-primary"></td>
+                {{ else if eq .Type "Workday" }}
+                <td class="bg-light text-dark"></td>
+                {{ else if eq .Type "Vacation" }}
+                <td class="bg-success"></td>
+                {{ end }}
+                {{ end }}
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+</div>
