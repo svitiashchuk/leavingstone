@@ -30,17 +30,20 @@ type Navigation struct {
 }
 
 func Serve() {
-	tmpl := template.Must(template.ParseFiles(
-		"templates/layout.html",
-		"templates/list.html",
-		"templates/fragments/tracker.html",
-	))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		tmpl := template.Must(template.ParseFiles(
+			"templates/layout.html",
+			"templates/list.html",
+		))
 		tmpl.ExecuteTemplate(w, "layout", nil)
 	})
 
 	http.HandleFunc("/tracker", func(w http.ResponseWriter, r *http.Request) {
+		tmpl := template.Must(template.ParseFiles(
+			"templates/fragments/tracker.html",
+		))
+
 		y, err := strconv.Atoi(r.URL.Query().Get("year"))
 		if err != nil {
 			y = time.Now().Year()
@@ -78,15 +81,24 @@ func Serve() {
 	})
 
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "GET" {
-			tmpl.ExecuteTemplate(w, "login.html", nil)
-		} else {
-			r.ParseForm()
-			fmt.Println(r.Form)
-			fmt.Println("username:", r.Form["username"])
-			fmt.Println("password:", r.Form["password"])
-		}
+		tmpl := template.Must(template.ParseFiles(
+			"templates/layout.html",
+			"templates/login.html",
+		))
 
+		if r.Method == "POST" {
+			r.ParseForm()
+
+			// TODO - retrieve user from DB and set token in cookie
+
+			w.Header().Add("HX-Redirect", "/login")
+			w.Header().Add("Set-Cookie", "auth_token=TOKEN; Path=/; HttpOnly")
+			tmpl.ExecuteTemplate(w, "layout", nil)
+		} else {
+			fmt.Printf(r.Method)
+			fmt.Println(tmpl.DefinedTemplates())
+			tmpl.ExecuteTemplate(w, "layout", nil)
+		}
 	})
 
 	http.ListenAndServe(":8080", nil)
