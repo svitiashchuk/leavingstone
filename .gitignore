@@ -22,3 +22,6 @@ go.work
 
 # Other directories
 tmp
+
+# DB
+database.db
