@@ -1,8 +1,7 @@
-package main
+package ptocker
 
 import (
 	"fmt"
-	"ptocker/server"
 	"time"
 )
 
@@ -16,25 +15,17 @@ type Vacation struct {
 	approved bool
 }
 
-type User struct {
-	name  string
-	email string
-	// date when user started to work:
-	started        time.Time
-	extraVacations int
-}
-
 func main() {
-	server.Serve()
+	// server.Serve()
 }
 
 func experiment() {
 	// create a new user:
 	u := User{
-		name:           "John",
-		email:          "john.doe@ptocker.com",
-		started:        time.Date(2022, 8, 21, 0, 0, 0, 0, time.UTC),
-		extraVacations: 0,
+		Name:          "John",
+		Email:         "john.doe@ptocker.com",
+		Started:       time.Date(2022, 8, 21, 0, 0, 0, 0, time.UTC),
+		ExtraVacation: 0,
 	}
 
 	fmt.Printf("User: %v\n", u)
@@ -70,13 +61,13 @@ func usedVacations(u User) int {
 func vacationsTotal(u User) int {
 	vacationsForPeriod := 0
 
-	if u.started.Year() == time.Now().Year() {
-		vacationsForPeriod = daysSinceJoined(u.started) * VacationsPerYear / YearDays
+	if u.Started.Year() == time.Now().Year() {
+		vacationsForPeriod = daysSinceJoined(u.Started) * VacationsPerYear / YearDays
 	} else {
 		vacationsForPeriod = daysSinceNewYear() * VacationsPerYear / YearDays
 	}
 
-	return vacationsForPeriod + u.extraVacations
+	return vacationsForPeriod + u.ExtraVacation
 }
 
 func daysSinceNewYear() int {

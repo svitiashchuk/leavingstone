@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"text/template"
 	"time"
+
+	"ptocker"
 )
 
 // Day types
@@ -156,20 +158,10 @@ func isLeap(year int) bool {
 
 type Leaves map[string]string
 
-type User struct {
-	Name   string
-	Leaves Leaves
-}
-
-type Leave struct {
-	Date string
-	Type string
-}
-
-func users() []User {
-	return []User{
-		{Name: "John", Leaves: Leaves{"01.01.2023": Vacation, "02.01.2023": SickDay}},
-		{Name: "Oliver", Leaves: Leaves{"03.02.2023": Vacation, "06.02.2023": Vacation, "07.02.2023": Vacation}},
+func users() []*ptocker.User {
+	return []*ptocker.User{
+		// {Name: "John", Leaves: Leaves{"01.01.2023": Vacation, "02.01.2023": SickDay}},
+		// {Name: "Oliver", Leaves: Leaves{"03.02.2023": Vacation, "06.02.2023": Vacation, "07.02.2023": Vacation}},
 	}
 }
 
