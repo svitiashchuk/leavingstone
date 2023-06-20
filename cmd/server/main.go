@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"ptocker/sqlite"
 )
@@ -19,6 +20,14 @@ func main() {
 			w.Write([]byte(u.Name))
 		}
 	})
+
+	http.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
+		uu, err := us.List()
+		if err != nil {
+			w.Write([]byte(err.Error()))
+		} else {
+			w.Write([]byte(fmt.Sprint(uu)))
+	}
 
 	err = http.ListenAndServe(":8887", nil)
 
