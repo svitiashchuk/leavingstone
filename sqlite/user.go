@@ -48,6 +48,7 @@ func (us *UserService) AllUsers() ([]*ptocker.User, error) {
 		return nil, err
 	}
 
+	// Map to store users by ID and collect leaves as child field for each user
 	users := map[int]*ptocker.User{}
 
 	for rows.Next() {
