@@ -66,20 +66,20 @@ func leavesToCalendar(ll []*ptocker.Leave) *Calendar {
 	return &c
 }
 
-func (c Calendar) Type(day time.Time) string {
+func (c Calendar) Get(day time.Time) LeaveDay {
 	if isWeekend(day) {
-		return Weekend
+		return LeaveDay{Weekend, true}
 	}
 
 	if isBankHoliday(day) {
-		return BankHoliday
+		return LeaveDay{BankHoliday, true}
 	}
 
 	if ld, ok := c[day.Format("2006-01-02")]; ok {
-		return ld.Type
+		return ld
 	}
 
-	return Workday
+	return LeaveDay{Workday, true}
 }
 
 func isWeekend(day time.Time) bool {

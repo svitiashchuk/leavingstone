@@ -38,19 +38,19 @@
             <tr>
                 <td>{{ $user.Name }}</td>
                 {{ range $day := $.Days }}
-                {{ $dayType := $user.Calendar.Type $day }}
-                {{if eq $dayType "SickDay" }}
-                <td class="bg-warning text-dark"></td>
-                {{ else if eq $dayType "dayoff" }}
-                <td class="bg-danger"></td>
-                {{ else if eq $dayType "weekend" }}
+                {{ $day := $user.Calendar.Get $day }}
+                {{if eq $day.Type "SickDay" }}
+                <td class="bg-warning text-dark">{{ if not $day.IsApproved }}⏳{{end}}</td>
+                {{ else if eq $day.Type "dayoff" }}
+                <td class="bg-danger">{{ if not $day.IsApproved }}⏳{{end}}</td>
+                {{ else if eq $day.Type "vacation" }}
+                <td class="bg-success">{{ if not $day.IsApproved }}⏳{{end}}</td>
+                {{ else if eq $day.Type "weekend" }}
                 <td class="bg-secondary"></td>
-                {{ else if eq $dayType "bankholiday" }}
+                {{ else if eq $day.Type "bankholiday" }}
                 <td class="bg-primary"></td>
-                {{ else if eq $dayType "workday" }}
+                {{ else if eq $day.Type "workday" }}
                 <td class="bg-light text-dark"></td>
-                {{ else if eq $dayType "vacation" }}
-                <td class="bg-success"></td>
                 {{ end }}
                 {{ end }}
             </tr>
