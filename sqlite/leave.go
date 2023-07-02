@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+const DBTimeFormat = "2006-01-02 15:04:05"
+
 type LeaveService struct {
 	db *sql.DB
 }
@@ -28,8 +30,8 @@ func (ls *LeaveService) List(from, to time.Time, limit int) ([]*ptocker.Leave, e
 		INNER JOIN users u ON l.user_id = u.id
 		WHERE l.start >= ? and l.end <= ?
 	`,
-		from.Format("2006-01-02 15:04:05"),
-		to.Format("2006-01-02 15:04:05"),
+		from.Format(DBTimeFormat),
+		to.Format(DBTimeFormat),
 	)
 
 	if err != nil {
@@ -56,4 +58,43 @@ func (ls *LeaveService) List(from, to time.Time, limit int) ([]*ptocker.Leave, e
 	}
 
 	return ll, nil
+}
+
+func (ls *LeaveService) Create(userID int, from, to time.Time, leaveType string) error {
+	_, err := ls.db.Query(
+		`INSERT INTO leaves (start, end, type, user_id) VALUES(?, ?, ?, ?)`,
+		from.Format(DBTimeFormat),
+		to.Format(DBTimeFormat),
+		userID,
+		leaveType,
+	)
+
+	return err
+}
+
+func (ls *LeaveService) Approve(id int) error {
+	_, err := ls.db.Query(
+		`UPDATE leaves SET approved = true WHERE id = ?`,
+		id,
+	)
+
+	return err
+}
+
+func (ls *LeaveService) Reject(id int) error {
+	_, err := ls.db.Query(
+		`UPDATE leaves SET approved = true WHERE id = ?`,
+		id,
+	)
+
+	return err
+}
+
+func (ls *LeaveService) Delete(id int) error {
+	_, err := ls.db.Query(
+		`DELETE FROM leaves WHERE id = ?`,
+		id,
+	)
+
+	return err
 }
