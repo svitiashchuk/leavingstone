@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"ptocker/internal/pkg/tracker"
@@ -116,10 +115,6 @@ func (s *Server) handleTracker(w http.ResponseWriter, r *http.Request) {
 		"Nav":   nav,
 		"Users": ee,
 		"Days":  days,
-	}
-
-	for _, e := range ee {
-		fmt.Printf("%+v", e.Calendar)
 	}
 
 	tmpl.ExecuteTemplate(w, "tracker.html", data)
