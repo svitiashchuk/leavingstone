@@ -30,8 +30,13 @@ func NewServer() *Server {
 		panic(err)
 	}
 
+	ls, err := sqlite.NewLeaveService()
+	if err != nil {
+		panic(err)
+	}
+
 	return &Server{
-		t: tracker.NewTracker(us),
+		t: tracker.NewTracker(us, ls),
 	}
 }
 

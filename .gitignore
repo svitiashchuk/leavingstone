@@ -22,6 +22,7 @@ go.work
 
 # Other directories
 tmp
+frontend/node_modules
 
 # DB
 database.db
