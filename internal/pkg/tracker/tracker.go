@@ -2,6 +2,7 @@ package tracker
 
 import (
 	"ptocker"
+	"sort"
 	"time"
 )
 
@@ -46,6 +47,8 @@ func (t *Tracker) List() []*Employee {
 	for i, u := range uu {
 		ee[i] = &Employee{u.Name, leavesToCalendar(u.Leaves)}
 	}
+
+	sort.Slice(ee, func(i, j int) bool { return ee[i].Name > ee[j].Name })
 
 	return ee
 }
