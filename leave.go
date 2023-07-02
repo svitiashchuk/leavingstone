@@ -8,4 +8,9 @@ type Leave struct {
 	Start    time.Time
 	End      time.Time
 	Approved bool
+	UserID   int
+}
+
+type LeaveService interface {
+	List(from, to time.Time, limit int) ([]*Leave, error)
 }
