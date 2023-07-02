@@ -39,7 +39,7 @@ func (us *UserService) AllUsers() ([]*ptocker.User, error) {
 	uu := []*ptocker.User{}
 
 	rows, err := us.db.Query(`
-		SELECT u.id, u.name, u.email, u.token, u.start, u.extra_vacation, l.id, l.start, l.end, l.type, l.approved
+		SELECT u.id, u.name, u.email, u.token, u.start, u.extra_vacation, l.id, l.start, l.end, l.type, l.approved, l.user_id
 		FROM users u
 		INNER JOIN leaves l ON u.id = l.user_id
 	`)
@@ -67,6 +67,7 @@ func (us *UserService) AllUsers() ([]*ptocker.User, error) {
 			&leave.End,
 			&leave.Type,
 			&leave.Approved,
+			&leave.UserID,
 		)
 
 		if err != nil {

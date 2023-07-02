@@ -18,10 +18,25 @@ const (
 
 type Tracker struct {
 	us ptocker.UserService
+	ls ptocker.LeaveService
 }
 
-func NewTracker(us ptocker.UserService) *Tracker {
-	return &Tracker{us}
+func NewTracker(us ptocker.UserService, ls ptocker.LeaveService) *Tracker {
+	return &Tracker{us, ls}
+}
+
+type Leave struct {
+	ID       int
+	Type     string
+	Start    time.Time
+	End      time.Time
+	Approved bool
+	Employee *EmployeeSummary
+}
+
+type EmployeeSummary struct {
+	ID   int
+	Name string
 }
 
 // todo: consider adding raw date as time.Time to allow different formatting if needed
@@ -51,6 +66,29 @@ func (t *Tracker) List() []*Employee {
 	sort.Slice(ee, func(i, j int) bool { return ee[i].Name > ee[j].Name })
 
 	return ee
+}
+
+func (t *Tracker) UpcomingLeaves() []*Leave {
+	from := time.Now()
+	to := from.Add(time.Duration(30 * 24 * time.Hour))
+	ll, err := t.ls.List(from, to, 50)
+	if err != nil {
+		panic(err)
+	}
+
+	ull := []*Leave{}
+	for _, l := range ll {
+		ull = append(ull, &Leave{
+			l.ID,
+			l.Type,
+			l.Start,
+			l.End,
+			l.Approved,
+			nil,
+		})
+	}
+
+	return ull
 }
 
 // leavesToCalendar converts from slice of Leaves that contains
