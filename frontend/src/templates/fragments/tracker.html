@@ -1,37 +1,17 @@
-<h3>Report for {{ .Nav.Now.Month }}</h3>
-<div class="grid grid-rows-4 grid-flow-col gap-4">
+<h3>Report for {{ .Nav.Now.Month }} {{ .Nav.Now.Year }}</h3>
+<div class="grid grid-flow-col gap-4">
     <div class="join">
-        <a class="join-item btn">«</a>
-        <button class="join-item btn">{{ .Nav.Now.Month }}-{{ .Nav.Now.Year }}</button>
-        <a class="join-item btn">»</a>
+        <a class="join-item btn" aria-label="Previous" hx-trigger="click" hx-target="#tracker-container"
+            hx-swap="innerHTML" hx-get="/tracker?year={{ .Nav.Prev.Year }}&month={{ .Nav.Prev.MonthNum }}">«</a>
+        <button class="join-item btn w-48">{{ .Nav.Now.Month }}</button>
+        <a class="join-item btn" aria-label="Next" hx-trigger="click" hx-target="#tracker-container" hx-swap="innerHTML"
+            hx-get="/tracker?year={{ .Nav.Next.Year }}&month={{ .Nav.Next.MonthNum }}">»</a>
     </div>
-    <!-- <nav aria-label="Page navigation example">
-        <ul class="pagination">
-            <li class="page-item">
-                <a class="page-link" href="#" aria-label="Previous" hx-trigger="click" hx-target="#tracker-container"
-                    hx-swap="innerHTML" hx-get="/tracker?year={{ .Nav.Prev.Year }}&month={{ .Nav.Prev.Month }}">
-                    <span aria-hidden="true">&laquo; {{ .Nav.Prev.Month }}-{{ .Nav.Prev.Year }}</span>
-                </a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="#">
-
-                </a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="#" aria-label="Next" hx-trigger="click" hx-target="#tracker-container"
-                    hx-swap="innerHTML" hx-get="/tracker?year={{ .Nav.Next.Year }}&month={{ .Nav.Next.Month }}">
-                    <span aria-hidden="true">{{ .Nav.Next.Month }}-{{ .Nav.Next.Year }} &raquo;</span>
-                </a>
-            </li>
-        </ul>
-    </nav> -->
 </div>
 
 <!-- End pagination block -->
-
-<div class="row">
-    <table class="table-bordered">
+<div class="overflow-scroll">
+    <table class="table-auto table-xs table-pin-cols">
         <thead>
             <th>Username</th>
             {{ range .Days }}
@@ -41,22 +21,27 @@
         <tbody>
             {{ range $user := .Users }}
             <tr>
-                <td>{{ $user.Name }}</td>
+                <td class="min-w-fit whitespace-nowrap">{{ $user.Name }}</td>
                 {{ range $day := $.Days }}
+
                 {{ $day := $user.Calendar.Get $day }}
-                {{if eq $day.Type "SickDay" }}
-                <td class="bg-warning text-dark">{{ if not $day.IsApproved }}⏳{{end}}</td>
+
+                {{ $dayTypeClass := "bg-stone" }}
+                {{ if eq $day.Type "sick" }}
+                {{ $dayTypeClass = "bg-warning" }}
                 {{ else if eq $day.Type "dayoff" }}
-                <td class="bg-danger">{{ if not $day.IsApproved }}⏳{{end}}</td>
+                {{ $dayTypeClass = "bg-primary" }}
                 {{ else if eq $day.Type "vacation" }}
-                <td class="bg-success">{{ if not $day.IsApproved }}⏳{{end}}</td>
+                {{ $dayTypeClass = "bg-accent" }}
                 {{ else if eq $day.Type "weekend" }}
-                <td class="bg-secondary"></td>
+                {{ $dayTypeClass = "bg-neutral" }}
                 {{ else if eq $day.Type "bankholiday" }}
-                <td class="bg-primary"></td>
+                {{ $dayTypeClass = "bg-secondary" }}
                 {{ else if eq $day.Type "workday" }}
-                <td class="bg-light text-dark"></td>
+                {{ $dayTypeClass = "bg-stone" }}
                 {{ end }}
+
+                <td class="{{ $dayTypeClass }} bg-gradient-to-d border border-zinc-700"></td>
                 {{ end }}
             </tr>
             {{ end }}

@@ -1,22 +1,15 @@
 {{define "title"}}Home{{end}}
 
 {{define "main"}}
-<h2>Leaves Tracker</h2>
-<div class="row mb-3">
-    <div class="col">
-        <span class="badge rounded-pill bg-light text-dark">Working</span>
-        <span class="badge rounded-pill bg-secondary">Weekend</span>
-        <span class="badge rounded-pill bg-info text-dark">Bank Holiday</span>
-        <span class="badge rounded-pill bg-success">Vacation</span>
-        <span class="badge rounded-pill bg-danger">Day off</span>
-        <span class="badge rounded-pill bg-warning text-dark">Sick Day</span>
-    </div>
+<h1>Leaves Tracker</h1>
+<div>
+    <div class="badge">Working</div>
+    <div class="badge badge-neutral">Weekend</div>
+    <div class="badge badge-secondary">Bank Holiday</div>
+    <div class="badge badge-primary">Day off</div>
+    <div class="badge badge-accent">Vacation</div>
+    <div class="badge badge-warning">Sick Day</div>
 </div>
 
-<div class="row">
-    <div class="col">
-        <div id="tracker-container" hx-get="/tracker?year=2023&month=2" hx-trigger="revealed" hx-swap="innerHTML">
-        </div>
-    </div>
-</div>
+<div id="tracker-container" hx-get="/tracker?year=2023&month=2" hx-trigger="revealed" hx-swap="innerHTML"></div>
 {{ end }}

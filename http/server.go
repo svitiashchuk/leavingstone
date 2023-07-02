@@ -1,7 +1,9 @@
 package http
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 	"ptocker/internal/pkg/tracker"
 	"ptocker/sqlite"
 	"strconv"
@@ -10,7 +12,7 @@ import (
 )
 
 type MonthPeriod struct {
-	Month int
+	Month time.Month
 	Year  int
 }
 
@@ -50,20 +52,23 @@ func (s *Server) registerRoutes() {
 	http.HandleFunc("/", s.handleIndex)
 	http.HandleFunc("/login", s.handleLogin)
 	http.HandleFunc("/tracker", s.handleTracker)
+
+	// assets for frontend
+	http.HandleFunc("/dist/", s.handleDist)
 }
 
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles(
-		"templates/layout.html",
-		"templates/list.html",
+		"frontend/src/templates/layout.html",
+		"frontend/src/templates/list.html",
 	))
 	tmpl.ExecuteTemplate(w, "layout", nil)
 }
 
 func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles(
-		"templates/layout.html",
-		"templates/login.html",
+		"frontend/src/templates/layout.html",
+		"frontend/src/templates/login.html",
 	))
 
 	if r.Method == "POST" {
@@ -82,7 +87,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleTracker(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles(
-		"templates/fragments/tracker.html",
+		"frontend/src/templates/fragments/tracker.html",
 	))
 
 	y, err := strconv.Atoi(r.URL.Query().Get("year"))
@@ -102,9 +107,9 @@ func (s *Server) handleTracker(w http.ResponseWriter, r *http.Request) {
 	prev := time.Date(y, time.Month(m-1), 1, 0, 0, 0, 0, time.UTC)
 
 	nav := Navigation{
-		Prev: MonthPeriod{Month: int(prev.Month()), Year: prev.Year()},
-		Now:  MonthPeriod{Month: int(time.Month(m)), Year: y},
-		Next: MonthPeriod{Month: int(next.Month()), Year: next.Year()},
+		Prev: MonthPeriod{Month: prev.Month(), Year: prev.Year()},
+		Now:  MonthPeriod{Month: time.Month(m), Year: y},
+		Next: MonthPeriod{Month: next.Month(), Year: next.Year()},
 	}
 
 	data := map[string]interface{}{
@@ -113,7 +118,26 @@ func (s *Server) handleTracker(w http.ResponseWriter, r *http.Request) {
 		"Days":  days,
 	}
 
+	for _, e := range ee {
+		fmt.Printf("%+v", e.Calendar)
+	}
+
 	tmpl.ExecuteTemplate(w, "tracker.html", data)
+}
+
+func (s *Server) handleDist(w http.ResponseWriter, r *http.Request) {
+	// TODO use embed:
+	b, err := os.ReadFile("frontend/dist/output.css")
+	if err != nil {
+		panic(err)
+	}
+
+	w.Header().Add("Content-type", "text/css")
+	w.Write(b)
+}
+
+func (mp MonthPeriod) MonthNum() int {
+	return int(mp.Month)
 }
 
 func month(year, month int) []time.Time {
