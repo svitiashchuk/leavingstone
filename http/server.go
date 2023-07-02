@@ -1,9 +1,7 @@
 package http
 
 import (
-	"fmt"
 	"net/http"
-	"ptocker"
 	"ptocker/internal/pkg/tracker"
 	"ptocker/sqlite"
 	"strconv"
@@ -72,8 +70,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Set-Cookie", "auth_token=TOKEN; Path=/; HttpOnly")
 		tmpl.ExecuteTemplate(w, "layout", nil)
 	} else {
-		fmt.Printf(r.Method)
-		fmt.Println(tmpl.DefinedTemplates())
+
 		tmpl.ExecuteTemplate(w, "layout", nil)
 	}
 }
@@ -93,17 +90,11 @@ func (s *Server) handleTracker(w http.ResponseWriter, r *http.Request) {
 		m = int(time.Now().Month())
 	}
 
-	// days := days(time.Now().Year())
 	days := month(y, m)
-	// uut := usersForTemplate(days, users())
 	ee := s.t.List()
-	fmt.Println(ee)
 
 	next := time.Date(y, time.Month(m+1), 1, 0, 0, 0, 0, time.UTC)
 	prev := time.Date(y, time.Month(m-1), 1, 0, 0, 0, 0, time.UTC)
-
-	fmt.Println(prev)
-	fmt.Println(next)
 
 	nav := Navigation{
 		Prev: MonthPeriod{Month: int(prev.Month()), Year: prev.Year()},
@@ -168,46 +159,4 @@ func daysInYear(year int) int {
 
 func isLeap(year int) bool {
 	return year%4 == 0 && year%100 != 0 || year%400 == 0
-}
-
-type Leaves map[string]string
-
-func users() []*ptocker.User {
-	return []*ptocker.User{
-		// {Name: "John", Leaves: Leaves{"01.01.2023": Vacation, "02.01.2023": SickDay}},
-		// {Name: "Oliver", Leaves: Leaves{"03.02.2023": Vacation, "06.02.2023": Vacation, "07.02.2023": Vacation}},
-	}
-}
-
-type Day struct {
-	Date time.Time
-	Type string
-}
-
-type UserForTemplate struct {
-	Name     string
-	UserDays []Day
-}
-
-// func usersForTemplate(days []time.Time, uu []*ptocker.User) []UserForTemplate {
-// 	uut := make([]UserForTemplate, len(uu))
-
-// 	for i, u := range uu {
-
-// 		ud := make([]Day, len(days))
-// 		for j, d := range days {
-// 			ud[j] = Day{Date: d, Type: u.DayType(d)}
-// 		}
-
-// 		uut[i] = UserForTemplate{
-// 			Name:     u.Name,
-// 			UserDays: ud,
-// 		}
-// 	}
-
-// 	return uut
-// }
-
-func GetMonthNumber(month time.Month) int {
-	return int(month)
 }
