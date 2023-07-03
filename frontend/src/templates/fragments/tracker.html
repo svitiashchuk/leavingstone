@@ -10,8 +10,8 @@
 </div>
 
 <!-- End pagination block -->
-<div class="overflow-scroll">
-    <table class="table-auto table-xs table-pin-cols">
+<div class="overflow-x-scroll min-h-screen">
+    <table class="table-auto table-xs table-pin-cols h-full">
         <thead>
             <th>Username</th>
             {{ range .Days }}
@@ -26,8 +26,10 @@
 
                 {{ $day := $user.Calendar.Get $day }}
 
-                {{ $dayTypeClass := "bg-stone" }}
-                {{ if eq $day.Type "sick" }}
+                {{ $dayTypeClass := "bg-base" }}
+                {{ if not $day.IsApproved }}
+                {{ $dayTypeClass = "bg-info" }}
+                {{ else if eq $day.Type "sick" }}
                 {{ $dayTypeClass = "bg-warning" }}
                 {{ else if eq $day.Type "dayoff" }}
                 {{ $dayTypeClass = "bg-primary" }}
@@ -38,10 +40,38 @@
                 {{ else if eq $day.Type "bankholiday" }}
                 {{ $dayTypeClass = "bg-secondary" }}
                 {{ else if eq $day.Type "workday" }}
-                {{ $dayTypeClass = "bg-stone" }}
+                {{ $dayTypeClass = "bg-base" }}
                 {{ end }}
 
-                <td class="{{ $dayTypeClass }} bg-gradient-to-d border border-zinc-700"></td>
+                <td class="{{ $dayTypeClass }} border border-zinc-700">
+                    {{ if not $day.IsApproved }}
+                    <details class="dropdown dropdown-left flex h-full cursor-pointer">
+                        <summary class="block flex-grow">&nbsp;</summary>
+                        <div class="shadow menu dropdown-content z-[100] card card-compact w-96 bg-primary rounded-box">
+                            <div class="card-body">
+                                <h3 class="card-title">Leave approval</h3>
+                                <p class="prose text-primary-content">You can approve or reject requested leave.</p>
+                                <div class="card-actions justify-end">
+                                    <button class="btn btn-circle btn-outline border-2">
+                                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
+                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                                stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5" />
+                                        </svg>
+                                    </button>
+                                    <button class="btn btn-circle btn-outline border-2">
+                                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
+                                            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                                            <path
+                                                d="m9.414 8 5.293-5.293a1 1 0 1 0-1.414-1.414L8 6.586 2.707 1.293a1 1 0 0 0-1.414 1.414L6.586 8l-5.293 5.293a1 1 0 1 0 1.414 1.414L8 9.414l5.293 5.293a1 1 0 0 0 1.414-1.414L9.414 8Z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+                    {{ end }}
+                </td>
                 {{ end }}
             </tr>
             {{ end }}
