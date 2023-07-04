@@ -1,11 +1,29 @@
-<h3>Report for {{ .Nav.Now.Month }} {{ .Nav.Now.Year }}</h3>
-<div class="grid grid-flow-col gap-4">
-    <div class="join">
-        <a class="join-item btn" aria-label="Previous" hx-trigger="click" hx-target="#tracker-container"
-            hx-swap="innerHTML" hx-get="/tracker?year={{ .Nav.Prev.Year }}&month={{ .Nav.Prev.MonthNum }}">«</a>
-        <button class="join-item btn w-48">{{ .Nav.Now.Month }}</button>
-        <a class="join-item btn" aria-label="Next" hx-trigger="click" hx-target="#tracker-container" hx-swap="innerHTML"
-            hx-get="/tracker?year={{ .Nav.Next.Year }}&month={{ .Nav.Next.MonthNum }}">»</a>
+<div class="flex justify-between">
+    <div>
+        <h3>Report for {{ .Nav.Now.Month }} {{ .Nav.Now.Year }}</h3>
+        <div class="join">
+            <a class="join-item btn" aria-label="Previous" hx-trigger="click" hx-target="#tracker-container"
+                hx-swap="innerHTML" hx-get="/tracker?year={{ .Nav.Prev.Year }}&month={{ .Nav.Prev.MonthNum }}">«</a>
+            <button class="join-item btn w-48">{{ .Nav.Now.Month }}</button>
+            <a class="join-item btn" aria-label="Next" hx-trigger="click" hx-target="#tracker-container"
+                hx-swap="innerHTML" hx-get="/tracker?year={{ .Nav.Next.Year }}&month={{ .Nav.Next.MonthNum }}">»</a>
+        </div>
+    </div>
+
+    <div class="stats shadow bg-base-200">
+        <div class="stat">
+            <div class="stat-figure text-success">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                    class="inline-block w-8 h-8 stroke-current">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z">
+                    </path>
+                </svg>
+            </div>
+            <div class="stat-title text-success">Workforce Power</div>
+            <div class="stat-value text-success">87%</div>
+            <div class="stat-desc">4 employees are time-off</div>
+        </div>
     </div>
 </div>
 

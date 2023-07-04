@@ -100,6 +100,11 @@ func (t *Tracker) RejectLeave(id int) {
 	t.ls.Delete(id)
 }
 
+// TODO calculate workforce power based on period
+func (t *Tracker) WorkforcePower(ee []*Employee) int {
+	return 87
+}
+
 // leavesToCalendar converts from slice of Leaves that contains
 // information about start and end of Leave to map where key-string
 // is a date in Calendar map and value is LeaveDay which stores information
