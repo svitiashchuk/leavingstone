@@ -41,6 +41,7 @@ type EmployeeSummary struct {
 
 // todo: consider adding raw date as time.Time to allow different formatting if needed
 type LeaveDay struct {
+	LeaveID    int
 	Type       string
 	IsApproved bool
 }
@@ -91,6 +92,14 @@ func (t *Tracker) UpcomingLeaves() []*Leave {
 	return ull
 }
 
+func (t *Tracker) ApproveLeave(id int) {
+	t.ls.Approve(id)
+}
+
+func (t *Tracker) RejectLeave(id int) {
+	t.ls.Delete(id)
+}
+
 // leavesToCalendar converts from slice of Leaves that contains
 // information about start and end of Leave to map where key-string
 // is a date in Calendar map and value is LeaveDay which stores information
@@ -100,7 +109,7 @@ func leavesToCalendar(ll []*ptocker.Leave) *Calendar {
 
 	for _, l := range ll {
 		for d := l.Start; d.Before(l.End); d = d.Add(24 * time.Hour) {
-			c[d.Format("2006-01-02")] = LeaveDay{l.Type, l.Approved}
+			c[d.Format("2006-01-02")] = LeaveDay{l.ID, l.Type, l.Approved}
 		}
 	}
 
@@ -109,18 +118,18 @@ func leavesToCalendar(ll []*ptocker.Leave) *Calendar {
 
 func (c Calendar) Get(day time.Time) LeaveDay {
 	if isWeekend(day) {
-		return LeaveDay{Weekend, true}
+		return LeaveDay{0, Weekend, true}
 	}
 
 	if isBankHoliday(day) {
-		return LeaveDay{BankHoliday, true}
+		return LeaveDay{0, BankHoliday, true}
 	}
 
 	if ld, ok := c[day.Format("2006-01-02")]; ok {
 		return ld
 	}
 
-	return LeaveDay{Workday, true}
+	return LeaveDay{0, Workday, true}
 }
 
 func isWeekend(day time.Time) bool {

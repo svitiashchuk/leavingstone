@@ -73,7 +73,7 @@ func (ls *LeaveService) Create(userID int, from, to time.Time, leaveType string)
 }
 
 func (ls *LeaveService) Approve(id int) error {
-	_, err := ls.db.Query(
+	_, err := ls.db.Exec(
 		`UPDATE leaves SET approved = true WHERE id = ?`,
 		id,
 	)
@@ -82,8 +82,8 @@ func (ls *LeaveService) Approve(id int) error {
 }
 
 func (ls *LeaveService) Reject(id int) error {
-	_, err := ls.db.Query(
-		`UPDATE leaves SET approved = true WHERE id = ?`,
+	_, err := ls.db.Exec(
+		`UPDATE leaves SET approved = false WHERE id = ?`,
 		id,
 	)
 
@@ -91,7 +91,7 @@ func (ls *LeaveService) Reject(id int) error {
 }
 
 func (ls *LeaveService) Delete(id int) error {
-	_, err := ls.db.Query(
+	_, err := ls.db.Exec(
 		`DELETE FROM leaves WHERE id = ?`,
 		id,
 	)

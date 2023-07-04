@@ -54,6 +54,9 @@ func (s *Server) registerRoutes() {
 
 	// assets for frontend
 	http.HandleFunc("/dist/", s.handleDist)
+
+	http.HandleFunc("/leaves/approve", s.handleLeaveApprove)
+	http.HandleFunc("/leaves/reject", s.handleLeaveReject)
 }
 
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
@@ -129,6 +132,36 @@ func (s *Server) handleDist(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Add("Content-type", "text/css")
 	w.Write(b)
+}
+
+func (s *Server) handleLeaveApprove(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		panic(err)
+	}
+
+	id, err := strconv.Atoi(r.Form.Get("id"))
+	if err != nil {
+		panic(err)
+	}
+
+	s.t.ApproveLeave(id)
+	s.handleTracker(w, r)
+}
+
+func (s *Server) handleLeaveReject(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		panic(err)
+	}
+
+	id, err := strconv.Atoi(r.Form.Get("id"))
+	if err != nil {
+		panic(err)
+	}
+
+	s.t.RejectLeave(id)
+	s.handleTracker(w, r)
 }
 
 func (mp MonthPeriod) MonthNum() int {

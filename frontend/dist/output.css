@@ -2919,6 +2919,10 @@ html {
   grid-template-rows: repeat(4, minmax(0, 1fr));
 }
 
+.justify-start {
+  justify-content: flex-start;
+}
+
 .justify-end {
   justify-content: flex-end;
 }
