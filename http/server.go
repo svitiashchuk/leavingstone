@@ -51,6 +51,7 @@ func (s *Server) registerRoutes() {
 	http.HandleFunc("/", s.handleIndex)
 	http.HandleFunc("/login", s.handleLogin)
 	http.HandleFunc("/tracker", s.handleTracker)
+	http.HandleFunc("/overview", s.handleOverview)
 
 	// assets for frontend
 	http.HandleFunc("/dist/", s.handleDist)
@@ -85,6 +86,15 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 		tmpl.ExecuteTemplate(w, "layout", nil)
 	}
+}
+
+func (s *Server) handleOverview(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles(
+		"frontend/src/templates/layout.html",
+		"frontend/src/templates/overview.html",
+	))
+
+	tmpl.ExecuteTemplate(w, "layout", nil)
 }
 
 func (s *Server) handleTracker(w http.ResponseWriter, r *http.Request) {
