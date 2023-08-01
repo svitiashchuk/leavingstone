@@ -10,7 +10,7 @@ import (
 // Day types
 const (
 	Vacation    = "vacation"
-	SickDay     = "sickday"
+	SickDay     = "sick"
 	DayOff      = "dayoff"
 	Workday     = "workday"
 	Weekend     = "weekend"
@@ -58,6 +58,11 @@ type Employee struct {
 type WorkforceStat struct {
 	AbsentEmployees int
 	WorkforcePower  int
+}
+
+type LeavesStat struct {
+	Pending   int
+	AllLeaves int
 }
 
 func (t *Tracker) List() []*Employee {
@@ -127,6 +132,35 @@ func (t *Tracker) WorkforceStat(period []time.Time, ee []*Employee) *WorkforceSt
 	return &WorkforceStat{
 		AbsentEmployees: len(absentEmployees),
 		WorkforcePower:  int(math.Round(100.0 * (float64(periodDays-absentDays) / float64(periodDays)))),
+	}
+}
+
+func (t *Tracker) LeavesStat(period []time.Time, ee []*Employee) *LeavesStat {
+	allLeaves := make(map[int]interface{})
+	pendingLeaves := make(map[int]interface{})
+
+	firstDay := period[0]
+	lastDay := period[len(period)-1]
+
+	for _, e := range ee {
+		for _, ld := range *e.Calendar {
+			if !ld.isLeave() || ld.Day.Before(firstDay) || ld.Day.After(lastDay) {
+				continue
+			}
+
+			if !ld.IsApproved {
+				pendingLeaves[ld.LeaveID] = nil
+			}
+
+			if ld.isLeave() {
+				allLeaves[ld.LeaveID] = nil
+			}
+		}
+	}
+
+	return &LeavesStat{
+		Pending:   len(pendingLeaves),
+		AllLeaves: len(allLeaves),
 	}
 }
 
