@@ -50,6 +50,7 @@ func (s *Server) Serve() {
 func (s *Server) registerRoutes() {
 	http.HandleFunc("/", s.handleIndex)
 	http.HandleFunc("/login", s.handleLogin)
+	http.HandleFunc("/profile", s.handleProfile)
 	http.HandleFunc("/tracker", s.handleTracker)
 	http.HandleFunc("/overview", s.handleOverview)
 
@@ -86,6 +87,15 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 		tmpl.ExecuteTemplate(w, "layout", nil)
 	}
+}
+
+func (s *Server) handleProfile(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles(
+		"frontend/src/templates/layout.html",
+		"frontend/src/templates/profile.html",
+	))
+
+	tmpl.ExecuteTemplate(w, "layout", nil)
 }
 
 func (s *Server) handleOverview(w http.ResponseWriter, r *http.Request) {
