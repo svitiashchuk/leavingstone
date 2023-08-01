@@ -125,12 +125,14 @@ func (s *Server) handleTracker(w http.ResponseWriter, r *http.Request) {
 	}
 
 	workforceStat := s.t.WorkforceStat(days, ee)
+	leavesStat := s.t.LeavesStat(days, ee)
 
 	data := map[string]interface{}{
 		"Nav":           nav,
 		"Users":         ee,
 		"Days":          days,
 		"WorkforceStat": workforceStat,
+		"LeavesStat":    leavesStat,
 	}
 
 	tmpl.ExecuteTemplate(w, "tracker.html", data)
