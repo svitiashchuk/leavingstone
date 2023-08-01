@@ -159,7 +159,9 @@ func (s *Server) handleLeaveApprove(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.t.ApproveLeave(id)
-	s.handleTracker(w, r)
+
+	// send hx-trigger header to reload full tracker
+	w.Header().Add("HX-Trigger", "reloadTracker")
 }
 
 func (s *Server) handleLeaveReject(w http.ResponseWriter, r *http.Request) {
@@ -174,7 +176,8 @@ func (s *Server) handleLeaveReject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.t.RejectLeave(id)
-	s.handleTracker(w, r)
+	// send hx-trigger header to reload full tracker
+	w.Header().Add("HX-Trigger", "reloadTracker")
 }
 
 func (mp MonthPeriod) MonthNum() int {
