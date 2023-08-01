@@ -1,6 +1,7 @@
 package tracker
 
 import (
+	"math"
 	"ptocker"
 	"sort"
 	"time"
@@ -44,6 +45,7 @@ type LeaveDay struct {
 	LeaveID    int
 	Type       string
 	IsApproved bool
+	Day        time.Time
 }
 
 type Calendar map[string]LeaveDay
@@ -51,6 +53,11 @@ type Calendar map[string]LeaveDay
 type Employee struct {
 	Name     string
 	Calendar *Calendar
+}
+
+type WorkforceStat struct {
+	AbsentEmployees int
+	WorkforcePower  int
 }
 
 func (t *Tracker) List() []*Employee {
@@ -100,9 +107,27 @@ func (t *Tracker) RejectLeave(id int) {
 	t.ls.Delete(id)
 }
 
-// TODO calculate workforce power based on period
-func (t *Tracker) WorkforcePower(ee []*Employee) int {
-	return 87
+func (t *Tracker) WorkforceStat(period []time.Time, ee []*Employee) *WorkforceStat {
+	absentDays := 0
+	absentEmployees := make(map[int]interface{})
+
+	firstDay := period[0]
+	lastDay := period[len(period)-1]
+	periodDays := len(period) * len(ee)
+
+	for k, e := range ee {
+		for _, ld := range *e.Calendar {
+			if ld.isLeave() && ld.IsApproved && ld.Day.After(firstDay) && ld.Day.Before(lastDay) {
+				absentDays++
+				absentEmployees[k] = nil
+			}
+		}
+	}
+
+	return &WorkforceStat{
+		AbsentEmployees: len(absentEmployees),
+		WorkforcePower:  int(math.Round(100.0 * (float64(periodDays-absentDays) / float64(periodDays)))),
+	}
 }
 
 // leavesToCalendar converts from slice of Leaves that contains
@@ -114,7 +139,7 @@ func leavesToCalendar(ll []*ptocker.Leave) *Calendar {
 
 	for _, l := range ll {
 		for d := l.Start; d.Before(l.End); d = d.Add(24 * time.Hour) {
-			c[d.Format("2006-01-02")] = LeaveDay{l.ID, l.Type, l.Approved}
+			c[d.Format("2006-01-02")] = LeaveDay{l.ID, l.Type, l.Approved, d}
 		}
 	}
 
@@ -123,18 +148,18 @@ func leavesToCalendar(ll []*ptocker.Leave) *Calendar {
 
 func (c Calendar) Get(day time.Time) LeaveDay {
 	if isWeekend(day) {
-		return LeaveDay{0, Weekend, true}
+		return LeaveDay{0, Weekend, true, day}
 	}
 
 	if isBankHoliday(day) {
-		return LeaveDay{0, BankHoliday, true}
+		return LeaveDay{0, BankHoliday, true, day}
 	}
 
 	if ld, ok := c[day.Format("2006-01-02")]; ok {
 		return ld
 	}
 
-	return LeaveDay{0, Workday, true}
+	return LeaveDay{0, Workday, true, day}
 }
 
 func isWeekend(day time.Time) bool {
@@ -143,4 +168,8 @@ func isWeekend(day time.Time) bool {
 
 func isBankHoliday(day time.Time) bool {
 	return false
+}
+
+func (ld *LeaveDay) isLeave() bool {
+	return ld.Type == Vacation || ld.Type == SickDay || ld.Type == DayOff
 }

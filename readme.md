@@ -44,3 +44,8 @@ If user joined company last year - they have extra days and calulation is done f
 		lastYearlyPeriod = time.Date(thisYear-1, initial.Month(), initial.Day(), 0, 0, 0, 0, time.UTC)
 	}
 ```
+
+---
+
+How to run:
+
