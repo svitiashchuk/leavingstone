@@ -124,10 +124,13 @@ func (s *Server) handleTracker(w http.ResponseWriter, r *http.Request) {
 		Next: MonthPeriod{Month: next.Month(), Year: next.Year()},
 	}
 
+	workforceStat := s.t.WorkforceStat(days, ee)
+
 	data := map[string]interface{}{
-		"Nav":   nav,
-		"Users": ee,
-		"Days":  days,
+		"Nav":           nav,
+		"Users":         ee,
+		"Days":          days,
+		"WorkforceStat": workforceStat,
 	}
 
 	tmpl.ExecuteTemplate(w, "tracker.html", data)
