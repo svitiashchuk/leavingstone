@@ -1,0 +1,43 @@
+{{define "title"}}Home{{end}}
+
+{{define "main"}}
+<h1>Profile</h1>
+
+<div class="grid grid-cols-3 gap-4 not-prose p-8">
+    <div>
+        <div class="card w-96 bg-base-100 shadow-xl">
+            <figure>
+                <div class="flex items-center space-x-4">
+                    <div
+                        class="relative inline-flex items-center justify-center m-3 w-16 h-16 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600 ring-2 ring-secondary">
+                        <span class="text-xl text-gray-600 dark:text-gray-300">JL</span>
+                    </div>
+                    <div class="text-xl dark:text-white">
+                        <div>Jese Leos</div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Joined in August 2014</div>
+                    </div>
+                </div>
+            </figure>
+            <div class="card-body">
+                <h2 class="card-title dark:text-white">
+                    Leaves left
+                </h2>
+                <div class="card-actions">
+                    <div class="w-full">
+                        <p>Days off and vacation: 12</p>
+                        <progress class="progress progress-primary w-full" value="78" max="100"></progress>
+                    </div>
+
+                    <div class="w-full">
+                        <p>Sick days: 3</p>
+                        <progress class="progress progress-warning w-full" value="44" max="100"></progress>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-span-2">
+        <h2 class="mb-8">Upcoming Leaves</h2>
+    </div>
+</div>
+{{ end }}
