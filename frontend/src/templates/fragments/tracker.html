@@ -4,7 +4,9 @@
         <div class="join">
             <a class="join-item btn" aria-label="Previous" hx-trigger="click" hx-target="#tracker-container"
                 hx-swap="innerHTML" hx-get="/tracker?year={{ .Nav.Prev.Year }}&month={{ .Nav.Prev.MonthNum }}">«</a>
-            <button class="join-item btn w-48">{{ .Nav.Now.Month }}</button>
+            <button class="join-item btn w-48" hx-target="#tracker-container" hx-swap="innerHTML"
+                hx-trigger="reloadTracker from:body" 
+                hx-get="/tracker?year={{ .Nav.Now.Year }}&month={{ .Nav.Now.MonthNum }}">{{ .Nav.Now.Month }}</button>
             <a class="join-item btn" aria-label="Next" hx-trigger="click" hx-target="#tracker-container"
                 hx-swap="innerHTML" hx-get="/tracker?year={{ .Nav.Next.Year }}&month={{ .Nav.Next.MonthNum }}">»</a>
         </div>
@@ -71,7 +73,6 @@
                                 <p class="prose text-primary-content">You can approve or reject requested leave.</p>
                                 <div class="card-actions justify-end">
                                     <button class="btn btn-circle btn-outline border-2" hx-post="/leaves/approve"
-                                        hx-target="#tracker-container" hx-swap="innerHTML"
                                         hx-vals='{"id": {{ $day.LeaveID }}}'>
                                         <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
                                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
@@ -80,7 +81,6 @@
                                         </svg>
                                     </button>
                                     <button class="btn btn-circle btn-outline border-2" hx-post="/leaves/reject"
-                                        hx-target="#tracker-container" hx-swap="innerHTML"
                                         hx-vals='{"id": {{ $day.LeaveID }}}'>
                                         <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
                                             xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
