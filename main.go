@@ -23,7 +23,7 @@ func experiment() {
 	// create a new user:
 	u := User{
 		Name:          "John",
-		Email:         "john.doe@ptocker.com",
+		Email:         "john.doe@leavingstone.com",
 		Started:       time.Date(2022, 8, 21, 0, 0, 0, 0, time.UTC),
 		ExtraVacation: 0,
 	}
