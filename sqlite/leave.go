@@ -2,7 +2,6 @@ package sqlite
 
 import (
 	"database/sql"
-	"ptocker"
 	"time"
 )
 
