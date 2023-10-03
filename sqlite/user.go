@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"database/sql"
+	"leavingstone"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -21,10 +22,10 @@ func NewUserService() (*UserService, error) {
 	return &UserService{db}, nil
 }
 
-func (us *UserService) Find(email string) (*ptocker.User, error) {
+func (us *UserService) Find(email string) (*leavingstone.User, error) {
 	row := us.db.QueryRow("SELECT name, email, token FROM users WHERE email = ?", email)
 
-	user := &ptocker.User{}
+	user := &leavingstone.User{}
 	err := row.Scan(&user.Name, &user.Email, &user.Token)
 	if err != nil {
 		return nil, err
@@ -33,8 +34,8 @@ func (us *UserService) Find(email string) (*ptocker.User, error) {
 	return user, nil
 }
 
-func (us *UserService) AllUsers() ([]*ptocker.User, error) {
-	uu := []*ptocker.User{}
+func (us *UserService) AllUsers() ([]*leavingstone.User, error) {
+	uu := []*leavingstone.User{}
 
 	rows, err := us.db.Query(`
 		SELECT u.id, u.name, u.email, u.token, u.start, u.extra_vacation, l.id, l.start, l.end, l.type, l.approved, l.user_id
@@ -47,11 +48,11 @@ func (us *UserService) AllUsers() ([]*ptocker.User, error) {
 	}
 
 	// Map to store users by ID and collect leaves as child field for each user
-	users := map[int]*ptocker.User{}
+	users := map[int]*leavingstone.User{}
 
 	for rows.Next() {
-		user := ptocker.User{}
-		leave := ptocker.Leave{}
+		user := leavingstone.User{}
+		leave := leavingstone.Leave{}
 
 		err := rows.Scan(
 			&user.ID,

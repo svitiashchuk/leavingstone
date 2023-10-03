@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"database/sql"
+	"leavingstone"
 	"time"
 )
 
@@ -21,7 +22,7 @@ func NewLeaveService() (*LeaveService, error) {
 	return &LeaveService{db}, nil
 }
 
-func (ls *LeaveService) List(from, to time.Time, limit int) ([]*ptocker.Leave, error) {
+func (ls *LeaveService) List(from, to time.Time, limit int) ([]*leavingstone.Leave, error) {
 	rows, err := ls.db.Query(`
 		SELECT
 		l.id, l.user_id, l.start, l.end, l.type, l.approved
@@ -37,9 +38,9 @@ func (ls *LeaveService) List(from, to time.Time, limit int) ([]*ptocker.Leave, e
 		return nil, err
 	}
 
-	ll := []*ptocker.Leave{}
+	ll := []*leavingstone.Leave{}
 	for rows.Next() {
-		leave := ptocker.Leave{}
+		leave := leavingstone.Leave{}
 		err = rows.Scan(
 			&leave.ID,
 			&leave.UserID,

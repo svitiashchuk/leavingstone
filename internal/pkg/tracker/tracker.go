@@ -1,6 +1,7 @@
 package tracker
 
 import (
+	"leavingstone"
 	"math"
 	"sort"
 	"time"
@@ -17,11 +18,11 @@ const (
 )
 
 type Tracker struct {
-	us ptocker.UserService
-	ls ptocker.LeaveService
+	us leavingstone.UserService
+	ls leavingstone.LeaveService
 }
 
-func NewTracker(us ptocker.UserService, ls ptocker.LeaveService) *Tracker {
+func NewTracker(us leavingstone.UserService, ls leavingstone.LeaveService) *Tracker {
 	return &Tracker{us, ls}
 }
 
@@ -167,7 +168,7 @@ func (t *Tracker) LeavesStat(period []time.Time, ee []*Employee) *LeavesStat {
 // information about start and end of Leave to map where key-string
 // is a date in Calendar map and value is LeaveDay which stores information
 // about particular type of Leave and whether it was approved.
-func leavesToCalendar(ll []*ptocker.Leave) *Calendar {
+func leavesToCalendar(ll []*leavingstone.Leave) *Calendar {
 	c := make(Calendar)
 
 	for _, l := range ll {
