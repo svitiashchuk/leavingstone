@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"ptocker/internal/pkg/tracker"
-	"ptocker/sqlite"
+	"leavingstone/internal/pkg/tracker"
+	"leavingstone/sqlite"
 )
 
 func main() {

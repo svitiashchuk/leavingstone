@@ -3,9 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"leavingstone/internal/pkg/tracker"
+	"leavingstone/sqlite"
 	"net/http"
-	"ptocker/internal/pkg/tracker"
-	"ptocker/sqlite"
 )
 
 func main() {
