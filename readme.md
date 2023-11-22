@@ -1,3 +1,14 @@
+### Running
+```shell
+docker run -it --rm \
+  -w "$PWD" \
+  -e "air_wd=$PWD" \
+  -v "$PWD":"$PWD" \
+  -p 8080:8887 \
+  cosmtrek/air -c .air.toml
+```
+
+
 - user: name, email, start-date
 - request: day-off
 - request: sick-day

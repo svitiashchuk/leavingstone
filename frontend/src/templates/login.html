@@ -4,20 +4,27 @@
 <form class="mx-auto" style="width: 400px;" action="/login" method="POST">
     <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
 
-    <div class="form-floating">
-        <input name="email" type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-        <label for="floatingInput">Email address</label>
+    <div class="mt-4">
+        <label for="email" class="block text-sm font-medium text-gray-700">Email address</label>
+        <div class="mt-1">
+            <input name="email" type="email" id="email" class="input input-bordered w-full" placeholder="name@example.com">
+        </div>
     </div>
-    <div class="form-floating">
-        <input name="password" type="password" class="form-control" id="floatingPassword" placeholder="Password">
-        <label for="floatingPassword">Password</label>
+    <div class="mt-4">
+        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+        <div class="mt-1">
+            <input name="password" type="password" id="password" class="input input-bordered w-full" placeholder="Password">
+        </div>
     </div>
 
-    <div class="checkbox mb-3">
-        <label>
-            <input type="checkbox" value="remember-me"> Remember me
+    <div class="mt-4">
+        <label class="inline-flex items-center">
+            <input type="checkbox" class="checkbox">
+            <span class="ml-2">Remember me</span>
         </label>
     </div>
-    <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
+    <div class="mt-4">
+        <button class="btn btn-primary w-full" type="submit">Sign in</button>
+    </div>
 </form>
 {{ end }}
