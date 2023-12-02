@@ -22,13 +22,8 @@ func main() {
 	t := tracker.NewTracker(us, ls)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		u, err := us.Find("abigail.johnson@example.com")
-		if err != nil {
-			w.Write([]byte(err.Error()))
-		} else {
-			w.Write([]byte(u.Name))
-		}
-	})
+    w.Write([]byte("Hello world"))
+  })
 
 	http.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
 		uu, err := us.AllUsers()
