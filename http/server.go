@@ -9,7 +9,8 @@ import (
 	"strconv"
 	"text/template"
 	"time"
-  "golang.org/x/crypto/bcrypt"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type MonthPeriod struct {
@@ -24,8 +25,9 @@ type Navigation struct {
 }
 
 type Server struct {
-  us *sqlite.UserService
-	t *tracker.Tracker
+	sm SessionManager
+	us *sqlite.UserService
+	t  *tracker.Tracker
 }
 
 func NewServer() *Server {
@@ -40,7 +42,8 @@ func NewServer() *Server {
 	}
 
 	return &Server{
-		t: tracker.NewTracker(us, ls),
+		sm: NewSessionKeeper(),
+		t:  tracker.NewTracker(us, ls),
 	}
 }
 
@@ -80,19 +83,19 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == "POST" {
 		r.ParseForm()
-    email := r.Form.Get("email")
-    passPlain := r.Form.Get("password")
+		email := r.Form.Get("email")
+		passPlain := r.Form.Get("password")
 
-    u, err := s.us.Find(email)
-    if err != nil {
-      panic(err)
-    }
-    err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(passPlain)) 
-    if err != nil {
-      panic(err)
-    }
+		u, err := s.us.Find(email)
+		if err != nil {
+			panic(err)
+		}
+		err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(passPlain))
+		if err != nil {
+			panic(err)
+		}
 
-    c := fmt.Sprintf("auth_token=%s; Path=/; HttpOnly", u.Token)
+		c := fmt.Sprintf("auth_token=%s; Path=/; HttpOnly", u.Token)
 		w.Header().Add("HX-Redirect", "/profile")
 		w.Header().Add("Set-Cookie", c)
 		tmpl.ExecuteTemplate(w, "layout", nil)
