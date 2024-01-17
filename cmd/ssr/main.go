@@ -8,6 +8,7 @@ import (
 func main() {
 	s := httpp.NewServer()
 
-	fmt.Println("Serving...")
-	s.Serve()
+	addr := ":8080"
+	fmt.Printf("Serving... at %s\n", addr)
+	s.Serve(addr)
 }

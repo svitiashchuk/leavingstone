@@ -47,10 +47,10 @@ func NewServer() *Server {
 	}
 }
 
-func (s *Server) Serve() {
+func (s *Server) Serve(addr string) {
 	s.registerRoutes()
 
-	http.ListenAndServe(":8887", nil)
+	http.ListenAndServe(addr, nil)
 }
 
 func (s *Server) registerRoutes() {
