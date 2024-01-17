@@ -2,5 +2,5 @@ version: '3'
 tasks:
   start:
     cmds:
-      - go build -o main ./cmd/ssr/main.go
+      - go build -o main ./cmd/ssr/
       - ./main

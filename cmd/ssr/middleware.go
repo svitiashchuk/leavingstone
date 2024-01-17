@@ -1,8 +1,8 @@
-package http
+package main
 
 import "net/http"
 
-func (app *Server) requireAuth(next http.HandlerFunc) http.HandlerFunc {
+func (app *App) requireAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if app.auth.isAuthenticated(r) {
 			next(w, r)

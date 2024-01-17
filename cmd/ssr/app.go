@@ -1,4 +1,4 @@
-package http
+package main
 
 import (
 	"fmt"
@@ -24,51 +24,28 @@ type Navigation struct {
 	Next MonthPeriod
 }
 
-type Server struct {
+type App struct {
 	sm   SessionManager
 	auth *Authenticator
 	us   *sqlite.UserService
 	t    *tracker.Tracker
 }
 
-func NewServer() *Server {
-	us, err := sqlite.NewUserService()
-	if err != nil {
-		panic(err)
-	}
-
-	ls, err := sqlite.NewLeaveService()
-	if err != nil {
-		panic(err)
-	}
-
-	return &Server{
-		sm: NewSessionKeeper(),
-		t:  tracker.NewTracker(us, ls),
-	}
-}
-
-func (s *Server) Serve(addr string) {
-	s.registerRoutes()
-
-	http.ListenAndServe(addr, nil)
-}
-
-func (s *Server) registerRoutes() {
-	http.HandleFunc("/", s.requireAuth(s.handleIndex))
-	http.HandleFunc("/login", s.handleLogin)
-	http.HandleFunc("/profile", s.requireAuth(s.handleProfile))
-	http.HandleFunc("/tracker", s.requireAuth(s.handleTracker))
-	http.HandleFunc("/overview", s.requireAuth(s.handleOverview))
+func (app *App) registerRoutes() {
+	http.HandleFunc("/", app.requireAuth(app.handleIndex))
+	http.HandleFunc("/login", app.handleLogin)
+	http.HandleFunc("/profile", app.requireAuth(app.handleProfile))
+	http.HandleFunc("/tracker", app.requireAuth(app.handleTracker))
+	http.HandleFunc("/overview", app.requireAuth(app.handleOverview))
 
 	// assets for frontend
-	http.HandleFunc("/dist/", s.handleDist)
+	http.HandleFunc("/dist/", app.handleDist)
 
-	http.HandleFunc("/leaves/approve", s.requireAuth(s.handleLeaveApprove))
-	http.HandleFunc("/leaves/reject", s.requireAuth(s.handleLeaveReject))
+	http.HandleFunc("/leaves/approve", app.requireAuth(app.handleLeaveApprove))
+	http.HandleFunc("/leaves/reject", app.requireAuth(app.handleLeaveReject))
 }
 
-func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
+func (s *App) handleIndex(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles(
 		"frontend/src/templates/layout.html",
 		"frontend/src/templates/list.html",
@@ -76,7 +53,7 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	tmpl.ExecuteTemplate(w, "layout", nil)
 }
 
-func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
+func (s *App) handleLogin(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles(
 		"frontend/src/templates/layout.html",
 		"frontend/src/templates/login.html",
@@ -106,7 +83,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *Server) handleProfile(w http.ResponseWriter, r *http.Request) {
+func (s *App) handleProfile(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles(
 		"frontend/src/templates/layout.html",
 		"frontend/src/templates/profile.html",
@@ -115,7 +92,7 @@ func (s *Server) handleProfile(w http.ResponseWriter, r *http.Request) {
 	tmpl.ExecuteTemplate(w, "layout", nil)
 }
 
-func (s *Server) handleOverview(w http.ResponseWriter, r *http.Request) {
+func (s *App) handleOverview(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles(
 		"frontend/src/templates/layout.html",
 		"frontend/src/templates/overview.html",
@@ -124,7 +101,7 @@ func (s *Server) handleOverview(w http.ResponseWriter, r *http.Request) {
 	tmpl.ExecuteTemplate(w, "layout", nil)
 }
 
-func (s *Server) handleTracker(w http.ResponseWriter, r *http.Request) {
+func (s *App) handleTracker(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles(
 		"frontend/src/templates/fragments/tracker.html",
 	))
@@ -165,7 +142,7 @@ func (s *Server) handleTracker(w http.ResponseWriter, r *http.Request) {
 	tmpl.ExecuteTemplate(w, "tracker.html", data)
 }
 
-func (s *Server) handleDist(w http.ResponseWriter, r *http.Request) {
+func (s *App) handleDist(w http.ResponseWriter, r *http.Request) {
 	// TODO use embed:
 	b, err := os.ReadFile("frontend/dist/output.css")
 	if err != nil {
@@ -176,7 +153,7 @@ func (s *Server) handleDist(w http.ResponseWriter, r *http.Request) {
 	w.Write(b)
 }
 
-func (s *Server) handleLeaveApprove(w http.ResponseWriter, r *http.Request) {
+func (s *App) handleLeaveApprove(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		panic(err)
@@ -193,7 +170,7 @@ func (s *Server) handleLeaveApprove(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("HX-Trigger", "reloadTracker")
 }
 
-func (s *Server) handleLeaveReject(w http.ResponseWriter, r *http.Request) {
+func (s *App) handleLeaveReject(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		panic(err)
@@ -209,7 +186,7 @@ func (s *Server) handleLeaveReject(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("HX-Trigger", "reloadTracker")
 }
 
-func (s *Server) htmxRedirect(w http.ResponseWriter, r *http.Request, url string) {
+func (s *App) htmxRedirect(w http.ResponseWriter, r *http.Request, url string) {
 	w.Header().Add("HX-Redirect", url)
 }
 
