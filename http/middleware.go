@@ -4,12 +4,15 @@ import "net/http"
 
 func (app *Server) requireAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !app.auth.isAuthenticated(r) {
-			app.htmxRedirect(w, r, "/login")
-			w.Write([]byte("You are not authorized to access this page"))
+		if app.auth.isAuthenticated(r) {
+			next(w, r)
 			return
 		}
 
-		next(w, r)
+		if isHTMX(r) {
+			app.htmxRedirect(w, r, "/login")
+		} else {
+			http.Redirect(w, r, "/login", http.StatusFound)
+		}
 	}
 }

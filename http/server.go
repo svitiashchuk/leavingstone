@@ -55,7 +55,7 @@ func (s *Server) Serve(addr string) {
 }
 
 func (s *Server) registerRoutes() {
-	http.HandleFunc("/", s.handleIndex)
+	http.HandleFunc("/", s.requireAuth(s.handleIndex))
 	http.HandleFunc("/login", s.handleLogin)
 	http.HandleFunc("/profile", s.requireAuth(s.handleProfile))
 	http.HandleFunc("/tracker", s.requireAuth(s.handleTracker))
