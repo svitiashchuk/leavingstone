@@ -30,3 +30,6 @@ database.db
 # IDE files
 .idea
 .vscode
+
+# Binary main that is often built in root of project
+main
