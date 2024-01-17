@@ -1,15 +1,26 @@
 package http
 
-import "net/http"
+import (
+	"leavingstone/sqlite"
+	"net/http"
+)
 
-const HTTPHeaderSessionID = "X-App-Session-ID"
+const HTTPHeaderAuthToken = "X-Auth-Token"
 
-func (app *Server) isAuthenticated(r *http.Request) bool {
-	sID := r.Header.Get(HTTPHeaderSessionID)
-	if sID == "" {
+type Authenticator struct {
+	us *sqlite.UserService
+}
+
+func (auth *Authenticator) isAuthenticated(r *http.Request) bool {
+	token := r.Header.Get(HTTPHeaderAuthToken)
+	if token == "" {
 		return false
 	}
 
-	// Validate the auth header using the session manager
-	return app.sm.Get(sID) != nil
+	u, err := auth.us.FindByToken(token)
+	if err != nil {
+		panic(err)
+	}
+
+	return u != nil
 }

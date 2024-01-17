@@ -25,9 +25,10 @@ type Navigation struct {
 }
 
 type Server struct {
-	sm SessionManager
-	us *sqlite.UserService
-	t  *tracker.Tracker
+	sm   SessionManager
+	auth *Authenticator
+	us   *sqlite.UserService
+	t    *tracker.Tracker
 }
 
 func NewServer() *Server {

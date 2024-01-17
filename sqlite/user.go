@@ -34,6 +34,18 @@ func (us *UserService) Find(email string) (*leavingstone.User, error) {
 	return user, nil
 }
 
+func (us *UserService) FindByToken(token string) (*leavingstone.User, error) {
+	row := us.db.QueryRow("SELECT name, email, token FROM users WHERE token = ?", token)
+
+	user := &leavingstone.User{}
+	err := row.Scan(&user.Name, &user.Email, &user.Token)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
 func (us *UserService) AllUsers() ([]*leavingstone.User, error) {
 	uu := []*leavingstone.User{}
 
