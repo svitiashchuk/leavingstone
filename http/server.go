@@ -96,7 +96,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 		}
 
 		c := fmt.Sprintf("auth_token=%s; Path=/; HttpOnly", u.Token)
-		w.Header().Add("HX-Redirect", "/profile")
+		s.htmxRedirect(w, r, "/profile")
 		w.Header().Add("Set-Cookie", c)
 		tmpl.ExecuteTemplate(w, "layout", nil)
 	} else {
@@ -206,6 +206,10 @@ func (s *Server) handleLeaveReject(w http.ResponseWriter, r *http.Request) {
 	s.t.RejectLeave(id)
 	// send hx-trigger header to reload full tracker
 	w.Header().Add("HX-Trigger", "reloadTracker")
+}
+
+func (s *Server) htmxRedirect(w http.ResponseWriter, r *http.Request, url string) {
+	w.Header().Add("HX-Redirect", url)
 }
 
 func (mp MonthPeriod) MonthNum() int {
