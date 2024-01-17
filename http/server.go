@@ -56,15 +56,15 @@ func (s *Server) Serve(addr string) {
 func (s *Server) registerRoutes() {
 	http.HandleFunc("/", s.handleIndex)
 	http.HandleFunc("/login", s.handleLogin)
-	http.HandleFunc("/profile", s.handleProfile)
-	http.HandleFunc("/tracker", s.handleTracker)
-	http.HandleFunc("/overview", s.handleOverview)
+	http.HandleFunc("/profile", s.requireAuth(s.handleProfile))
+	http.HandleFunc("/tracker", s.requireAuth(s.handleTracker))
+	http.HandleFunc("/overview", s.requireAuth(s.handleOverview))
 
 	// assets for frontend
 	http.HandleFunc("/dist/", s.handleDist)
 
-	http.HandleFunc("/leaves/approve", s.handleLeaveApprove)
-	http.HandleFunc("/leaves/reject", s.handleLeaveReject)
+	http.HandleFunc("/leaves/approve", s.requireAuth(s.handleLeaveApprove))
+	http.HandleFunc("/leaves/reject", s.requireAuth(s.handleLeaveReject))
 }
 
 func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {

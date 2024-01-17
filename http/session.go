@@ -3,8 +3,8 @@ package http
 import "errors"
 
 type SessionManager interface {
-	get(id string) *Session
-	create(id string) (*Session, error)
+	Get(id string) *Session
+	Create(id string) (*Session, error)
 }
 
 type SessionKeeper struct {
@@ -17,11 +17,11 @@ func NewSessionKeeper() SessionManager {
 	}
 }
 
-func (sk *SessionKeeper) get(id string) *Session {
+func (sk *SessionKeeper) Get(id string) *Session {
 	return sk.sessions[id]
 }
 
-func (sk *SessionKeeper) create(id string) (*Session, error) {
+func (sk *SessionKeeper) Create(id string) (*Session, error) {
 	if _, exists := sk.sessions[id]; exists {
 		return nil, errors.New("session already exists")
 	}

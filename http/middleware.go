@@ -2,10 +2,13 @@ package http
 
 import "net/http"
 
-func authMiddleware(endpointHandler http.HandlerFunc) http.HandlerFunc {
+func (app *Server) requireAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// check session
-		// if session exists, continue
-		// if session does not exist, redirect to login
+		if !app.isAuthenticated(r) {
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
+
+		next(w, r)
 	}
 }
