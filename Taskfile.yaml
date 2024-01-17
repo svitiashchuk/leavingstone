@@ -4,3 +4,6 @@ tasks:
     cmds:
       - go build -o main ./cmd/ssr/
       - ./main
+  migrate:
+    cmds:
+      - ./migrations/run.sh

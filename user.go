@@ -7,7 +7,7 @@ type User struct {
 	Name          string
 	Email         string
 	Token         string
-  Password      string
+	Password      string
 	Leaves        []*Leave
 	Started       time.Time
 	ExtraVacation int

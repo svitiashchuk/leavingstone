@@ -68,6 +68,7 @@ func (s *App) handleLogin(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			panic(err)
 		}
+
 		err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(passPlain))
 		if err != nil {
 			panic(err)
@@ -76,11 +77,9 @@ func (s *App) handleLogin(w http.ResponseWriter, r *http.Request) {
 		c := fmt.Sprintf("auth_token=%s; Path=/; HttpOnly", u.Token)
 		s.htmxRedirect(w, r, "/profile")
 		w.Header().Add("Set-Cookie", c)
-		tmpl.ExecuteTemplate(w, "layout", nil)
-	} else {
-
-		tmpl.ExecuteTemplate(w, "layout", nil)
 	}
+
+	tmpl.ExecuteTemplate(w, "layout", nil)
 }
 
 func (s *App) handleProfile(w http.ResponseWriter, r *http.Request) {

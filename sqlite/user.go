@@ -23,10 +23,10 @@ func NewUserService() (*UserService, error) {
 }
 
 func (us *UserService) Find(email string) (*leavingstone.User, error) {
-	row := us.db.QueryRow("SELECT name, email, token FROM users WHERE email = ?", email)
+	row := us.db.QueryRow("SELECT name, email, token, password FROM users WHERE email = ?", email)
 
 	user := &leavingstone.User{}
-	err := row.Scan(&user.Name, &user.Email, &user.Token)
+	err := row.Scan(&user.Name, &user.Email, &user.Token, &user.Password)
 	if err != nil {
 		return nil, err
 	}

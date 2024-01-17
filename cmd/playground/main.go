@@ -2,18 +2,30 @@ package main
 
 import (
 	"fmt"
-	"leavingstone/internal/pkg/tracker"
-	"leavingstone/sqlite"
+	"os"
+	"strings"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func main() {
-	us, _ := sqlite.NewUserService()
-	ls, _ := sqlite.NewLeaveService()
-	t := tracker.NewTracker(us, ls)
+	b, _ := os.ReadFile("source_pass.txt")
 
-	ee := t.List()
+	s := string(b)
+	passwords := strings.Split(s, "\n")
 
-	for _, e := range ee {
-		fmt.Printf("%#v\n", e)
+	for i, p := range passwords {
+		passwords[i] = fmt.Sprintf("%s: %s", p, HashPassword(p))
 	}
+
+	os.WriteFile("bcrypted_pass.txt", []byte(strings.Join(passwords, "\n")), 0644)
+}
+
+func HashPassword(password string) string {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(hash)
 }
