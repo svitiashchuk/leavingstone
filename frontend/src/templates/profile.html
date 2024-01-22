@@ -5,7 +5,7 @@
 
 <div class="grid grid-cols-3 gap-4 not-prose p-8">
     <div>
-        <div class="card w-96 bg-base-100 shadow-xl">
+        <div class="card h-full w-96 bg-base-100 shadow-xl">
             <figure>
                 <div class="flex items-center space-x-4">
                     <div
@@ -37,7 +37,14 @@
         </div>
     </div>
     <div class="col-span-2">
-        <h2 class="mb-8">Upcoming Leaves</h2>
+        <h3 class="text-2xl font-bold h-3 mb-8">Upcoming Leaves</h2>
+        <div class="overflow-y-auto">
+            <ul class="steps steps-vertical">
+                <li data-content="✈" class="step step-success">Vacation on 21 Jan - 24 Jan (3 days)</li>
+                <li data-content="✚" class="step step-warning">Sick day on 28 Jan (1 day)</li>
+                <li data-content="⧖" class="step step-info">Day off on 29 Jan (1 day)</li>
+            </ul>
+        </div>
     </div>
 </div>
 {{ end }}
