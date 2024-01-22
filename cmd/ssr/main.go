@@ -28,6 +28,7 @@ func main() {
 		sm:   NewSessionKeeper(),
 		auth: auth,
 		us:   us,
+		ls:   ls,
 		t:    t,
 	}
 

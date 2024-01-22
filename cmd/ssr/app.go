@@ -24,11 +24,16 @@ type App struct {
 	sm   SessionManager
 	auth *Authenticator
 	us   *sqlite.UserService
+	ls   *sqlite.LeaveService
 	t    *tracker.Tracker
 }
 
 type CommonTemplateData struct {
 	IsAuthenticated bool
+}
+
+type CommonFormTemplateData struct {
+	Errors []string
 }
 
 type ProfileTemplateData struct {
@@ -46,10 +51,11 @@ type TrackerTemplateData struct {
 }
 
 func (app *App) registerRoutes() {
-	http.HandleFunc("/", app.authenticate(app.requireAuth(app.handleIndex)))
 	http.HandleFunc("/login", app.handleLogin)
-	http.HandleFunc("/profile", app.authenticate(app.requireAuth((app.handleProfile))))
-	http.HandleFunc("/tracker", app.authenticate(app.requireAuth((app.handleTracker))))
+	http.HandleFunc("/", app.authenticate(app.requireAuth(app.handleIndex)))
+	http.HandleFunc("/plan-leave", app.authenticate(app.requireAuth(app.handlePlanLeave)))
+	http.HandleFunc("/profile", app.authenticate(app.requireAuth(app.handleProfile)))
+	http.HandleFunc("/tracker", app.authenticate(app.requireAuth(app.handleTracker)))
 	http.HandleFunc("/overview", app.authenticate(app.requireAuth(app.handleOverview)))
 
 	// assets for frontend
@@ -114,6 +120,54 @@ func (app *App) handleProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tmpl.ExecuteTemplate(w, "layout", templateData)
+}
+
+func (app *App) handlePlanLeave(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		r.ParseForm()
+		startDate := r.Form.Get("start_date")
+		endDate := r.Form.Get("end_date")
+		leaveType := r.Form.Get("leave_type")
+
+		startDateParsed, err := time.Parse("2006-01-02", startDate)
+		if err != nil {
+			panic(err)
+		}
+
+		endDateParsed, err := time.Parse("2006-01-02", endDate)
+		if err != nil {
+			panic(err)
+		}
+
+		err = app.ls.Create(app.userID(r), startDateParsed, endDateParsed, leaveType)
+		if err != nil {
+			panic(err)
+		}
+
+		// TODO: app.sm.SetFlash(w, "Leave request created successfully")
+		// simple http redirect
+		http.Redirect(w, r, "/overview", http.StatusFound)
+	} else {
+		// Render the form for planning leave
+		tmpl := template.Must(template.ParseFiles(
+			"frontend/src/templates/layout.html",
+			"frontend/src/templates/plan_leave.html",
+		))
+
+		data := struct {
+			CommonFormTemplateData
+			CommonTemplateData
+			LeaveTypes []string
+		}{
+			CommonFormTemplateData: CommonFormTemplateData{
+				Errors: []string{},
+			},
+			CommonTemplateData: *app.commonTemplateData(r),
+			LeaveTypes:         tracker.LeaveTypes(),
+		}
+
+		tmpl.ExecuteTemplate(w, "layout", data)
+	}
 }
 
 func (app *App) handleOverview(w http.ResponseWriter, r *http.Request) {

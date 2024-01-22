@@ -1,0 +1,40 @@
+{{define "title"}}Plan a Leave{{end}}
+
+{{define "main"}}
+<div class="flex justify-center items-center h-screen">
+    <div class="w-1/2 rounded-lg shadow-lg p-8">
+        <h2 class="text-2xl font-bold mb-4">Plan Leave</h2>
+        <form action="/plan-leave" method="POST" class="space-y-4">
+            <div>
+                <label for="start_date" class="block font-medium">Start Date</label>
+                <input type="date" id="start_date" name="start_date" class="input input-bordered w-full max-w-xs">
+            </div>
+            <div>
+                <label for="end_date" class="block font-medium">End Date</label>
+                <input type="date" id="end_date" name="end_date" class="input input-bordered w-full max-w-xs">
+            </div>
+            <div>
+                <label for="leave_type" class="block font-medium">Leave Type</label>
+                <select id="leave_type" name="leave_type" class="select select-success w-full max-w-xs">
+                    <option value="">Select Leave Type</option>
+                    {{ range .LeaveTypes }}
+                    <option value="{{ . }}">{{ . }}</option>
+                    {{ end }}
+                </select>
+            </div>
+            <div>
+                <button type="submit" class="bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600">Submit</button>
+            </div>
+        </form>
+        {{ if .Errors }}
+        <div class="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded">
+            <ul>
+                {{ range .Errors }}
+                <li>{{ . }}</li>
+                {{ end }}
+            </ul>
+        </div>
+        {{ end }}
+    </div>
+</div>
+{{ end }}

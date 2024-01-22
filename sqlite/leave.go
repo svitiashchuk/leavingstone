@@ -61,12 +61,13 @@ func (ls *LeaveService) List(from, to time.Time, limit int) ([]*leavingstone.Lea
 }
 
 func (ls *LeaveService) Create(userID int, from, to time.Time, leaveType string) error {
-	_, err := ls.db.Query(
-		`INSERT INTO leaves (start, end, type, user_id) VALUES(?, ?, ?, ?)`,
+	_, err := ls.db.Exec(
+		`INSERT INTO leaves (start, end, user_id, type, approved) VALUES(?, ?, ?, ?, ?)`,
 		from.Format(DBTimeFormat),
 		to.Format(DBTimeFormat),
 		userID,
 		leaveType,
+		false,
 	)
 
 	return err

@@ -6,4 +6,5 @@ tasks:
       - ./main
   migrate:
     cmds:
+      - rm database.db
       - ./migrations/run.sh

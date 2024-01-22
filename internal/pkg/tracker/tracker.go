@@ -207,3 +207,11 @@ func isBankHoliday(day time.Time) bool {
 func (ld *LeaveDay) isLeave() bool {
 	return ld.Type == Vacation || ld.Type == SickDay || ld.Type == DayOff
 }
+
+func DayTypes() []string {
+	return []string{Vacation, SickDay, DayOff, Workday, Weekend, BankHoliday}
+}
+
+func LeaveTypes() []string {
+	return []string{Vacation, SickDay, DayOff}
+}
