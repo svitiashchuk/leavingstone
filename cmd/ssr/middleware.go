@@ -26,6 +26,8 @@ func (app *App) authenticate(next http.HandlerFunc) http.HandlerFunc {
 		if u != nil {
 			ctx := r.Context()
 			ctx = context.WithValue(ctx, isAuthenticatedContextKey, true)
+			ctx = context.WithValue(ctx, userIDContextKey, u.ID)
+
 			next(w, r.WithContext(ctx))
 			return
 		}

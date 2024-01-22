@@ -22,11 +22,23 @@ func NewUserService() (*UserService, error) {
 	return &UserService{db}, nil
 }
 
-func (us *UserService) Find(email string) (*leavingstone.User, error) {
-	row := us.db.QueryRow("SELECT name, email, token, password FROM users WHERE email = ?", email)
+func (us *UserService) FindByID(id int) (*leavingstone.User, error) {
+	row := us.db.QueryRow("SELECT id, name, email, token, password FROM users WHERE id = ?", id)
 
 	user := &leavingstone.User{}
-	err := row.Scan(&user.Name, &user.Email, &user.Token, &user.Password)
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Token, &user.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (us *UserService) Find(email string) (*leavingstone.User, error) {
+	row := us.db.QueryRow("SELECT id, name, email, token, password FROM users WHERE email = ?", email)
+
+	user := &leavingstone.User{}
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Token, &user.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -35,10 +47,10 @@ func (us *UserService) Find(email string) (*leavingstone.User, error) {
 }
 
 func (us *UserService) FindByToken(token string) (*leavingstone.User, error) {
-	row := us.db.QueryRow("SELECT name, email, token FROM users WHERE token = ?", token)
+	row := us.db.QueryRow("SELECT id, name, email, token FROM users WHERE token = ?", token)
 
 	user := &leavingstone.User{}
-	err := row.Scan(&user.Name, &user.Email, &user.Token)
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Token)
 	if err != nil {
 		return nil, err
 	}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"leavingstone"
 	"leavingstone/internal/pkg/tracker"
 	"leavingstone/sqlite"
 	"net/http"
@@ -31,8 +32,13 @@ type App struct {
 	t    *tracker.Tracker
 }
 
-type TemplateData struct {
+type CommonTemplateData struct {
 	IsAuthenticated bool
+}
+
+type ProfileTemplateData struct {
+	CommonTemplateData
+	User *leavingstone.User
 }
 
 func (app *App) registerRoutes() {
@@ -55,7 +61,7 @@ func (app *App) handleIndex(w http.ResponseWriter, r *http.Request) {
 		"frontend/src/templates/list.html",
 	))
 
-	tmpl.ExecuteTemplate(w, "layout", app.templateData(r))
+	tmpl.ExecuteTemplate(w, "layout", app.commonTemplateData(r))
 }
 
 func (app *App) handleLogin(w http.ResponseWriter, r *http.Request) {
@@ -84,7 +90,7 @@ func (app *App) handleLogin(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Set-Cookie", c)
 	}
 
-	tmpl.ExecuteTemplate(w, "layout", app.templateData(r))
+	tmpl.ExecuteTemplate(w, "layout", app.commonTemplateData(r))
 }
 
 func (app *App) handleProfile(w http.ResponseWriter, r *http.Request) {
@@ -93,7 +99,17 @@ func (app *App) handleProfile(w http.ResponseWriter, r *http.Request) {
 		"frontend/src/templates/profile.html",
 	))
 
-	tmpl.ExecuteTemplate(w, "layout", app.templateData(r))
+	u, err := app.us.FindByID(app.userID(r))
+	if err != nil {
+		panic(err)
+	}
+
+	templateData := &ProfileTemplateData{
+		CommonTemplateData: *app.commonTemplateData(r),
+		User:               u,
+	}
+
+	tmpl.ExecuteTemplate(w, "layout", templateData)
 }
 
 func (app *App) handleOverview(w http.ResponseWriter, r *http.Request) {
@@ -102,7 +118,7 @@ func (app *App) handleOverview(w http.ResponseWriter, r *http.Request) {
 		"frontend/src/templates/overview.html",
 	))
 
-	tmpl.ExecuteTemplate(w, "layout", app.templateData(r))
+	tmpl.ExecuteTemplate(w, "layout", app.commonTemplateData(r))
 }
 
 func (app *App) handleTracker(w http.ResponseWriter, r *http.Request) {
@@ -248,8 +264,8 @@ func isLeap(year int) bool {
 	return year%4 == 0 && year%100 != 0 || year%400 == 0
 }
 
-func (app *App) templateData(r *http.Request) *TemplateData {
-	return &TemplateData{
+func (app *App) commonTemplateData(r *http.Request) *CommonTemplateData {
+	return &CommonTemplateData{
 		IsAuthenticated: app.isAuthenticated(r),
 	}
 }
