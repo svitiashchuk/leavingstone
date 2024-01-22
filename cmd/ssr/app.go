@@ -41,6 +41,15 @@ type ProfileTemplateData struct {
 	User *leavingstone.User
 }
 
+type TrackerTemplateData struct {
+	CommonTemplateData
+	Nav           Navigation
+	Employees     []*tracker.Employee
+	Days          []time.Time
+	WorkforceStat *tracker.WorkforceStat
+	LeavesStat    *tracker.LeavesStat
+}
+
 func (app *App) registerRoutes() {
 	http.HandleFunc("/", app.authenticate(app.requireAuth(app.handleIndex)))
 	http.HandleFunc("/login", app.handleLogin)
@@ -148,15 +157,13 @@ func (app *App) handleTracker(w http.ResponseWriter, r *http.Request) {
 		Next: MonthPeriod{Month: next.Month(), Year: next.Year()},
 	}
 
-	workforceStat := app.t.WorkforceStat(days, ee)
-	leavesStat := app.t.LeavesStat(days, ee)
-
-	data := map[string]interface{}{
-		"Nav":           nav,
-		"Users":         ee,
-		"Days":          days,
-		"WorkforceStat": workforceStat,
-		"LeavesStat":    leavesStat,
+	data := &TrackerTemplateData{
+		CommonTemplateData: *app.commonTemplateData(r),
+		Nav:                nav,
+		Employees:          ee,
+		Days:               days,
+		WorkforceStat:      app.t.WorkforceStat(days, ee),
+		LeavesStat:         app.t.LeavesStat(days, ee),
 	}
 
 	tmpl.ExecuteTemplate(w, "tracker.html", data)

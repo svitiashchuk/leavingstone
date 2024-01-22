@@ -49,12 +49,12 @@
             {{ end }}
         </thead>
         <tbody>
-            {{ range $user := .Users }}
+            {{ range $employee := .Employees }}
             <tr>
-                <td class="min-w-fit whitespace-nowrap">{{ $user.Name }}</td>
+                <td class="min-w-fit whitespace-nowrap">{{ $employee.Name }}</td>
                 {{ range $day := $.Days }}
 
-                {{ $day := $user.Calendar.Get $day }}
+                {{ $day := $employee.Calendar.Get $day }}
 
                 {{ $dayTypeClass := "bg-base" }}
                 {{ if not $day.IsApproved }}
