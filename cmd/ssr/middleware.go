@@ -1,10 +1,13 @@
 package main
 
-import "net/http"
+import (
+	"context"
+	"net/http"
+)
 
 func (app *App) requireAuth(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if app.auth.isAuthenticated(r) {
+		if app.isAuthenticated(r) {
 			next(w, r)
 			return
 		}
@@ -14,5 +17,19 @@ func (app *App) requireAuth(next http.HandlerFunc) http.HandlerFunc {
 		} else {
 			http.Redirect(w, r, "/login", http.StatusFound)
 		}
+	}
+}
+
+func (app *App) authenticate(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		u := app.auth.authenticate(r)
+		if u != nil {
+			ctx := r.Context()
+			ctx = context.WithValue(ctx, isAuthenticatedContextKey, true)
+			next(w, r.WithContext(ctx))
+			return
+		}
+
+		next(w, r)
 	}
 }

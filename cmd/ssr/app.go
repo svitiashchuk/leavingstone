@@ -31,29 +31,34 @@ type App struct {
 	t    *tracker.Tracker
 }
 
+type TemplateData struct {
+	IsAuthenticated bool
+}
+
 func (app *App) registerRoutes() {
-	http.HandleFunc("/", app.requireAuth(app.handleIndex))
+	http.HandleFunc("/", app.authenticate(app.requireAuth(app.handleIndex)))
 	http.HandleFunc("/login", app.handleLogin)
-	http.HandleFunc("/profile", app.requireAuth(app.handleProfile))
-	http.HandleFunc("/tracker", app.requireAuth(app.handleTracker))
-	http.HandleFunc("/overview", app.requireAuth(app.handleOverview))
+	http.HandleFunc("/profile", app.authenticate(app.requireAuth((app.handleProfile))))
+	http.HandleFunc("/tracker", app.authenticate(app.requireAuth((app.handleTracker))))
+	http.HandleFunc("/overview", app.authenticate(app.requireAuth(app.handleOverview)))
 
 	// assets for frontend
 	http.HandleFunc("/dist/", app.handleDist)
 
-	http.HandleFunc("/leaves/approve", app.requireAuth(app.handleLeaveApprove))
-	http.HandleFunc("/leaves/reject", app.requireAuth(app.handleLeaveReject))
+	http.HandleFunc("/leaves/approve", app.authenticate(app.requireAuth(app.handleLeaveApprove)))
+	http.HandleFunc("/leaves/reject", app.authenticate(app.requireAuth(app.handleLeaveReject)))
 }
 
-func (s *App) handleIndex(w http.ResponseWriter, r *http.Request) {
+func (app *App) handleIndex(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles(
 		"frontend/src/templates/layout.html",
 		"frontend/src/templates/list.html",
 	))
-	tmpl.ExecuteTemplate(w, "layout", nil)
+
+	tmpl.ExecuteTemplate(w, "layout", app.templateData(r))
 }
 
-func (s *App) handleLogin(w http.ResponseWriter, r *http.Request) {
+func (app *App) handleLogin(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles(
 		"frontend/src/templates/layout.html",
 		"frontend/src/templates/login.html",
@@ -64,7 +69,7 @@ func (s *App) handleLogin(w http.ResponseWriter, r *http.Request) {
 		email := r.Form.Get("email")
 		passPlain := r.Form.Get("password")
 
-		u, err := s.us.Find(email)
+		u, err := app.us.Find(email)
 		if err != nil {
 			panic(err)
 		}
@@ -75,32 +80,32 @@ func (s *App) handleLogin(w http.ResponseWriter, r *http.Request) {
 		}
 
 		c := fmt.Sprintf("auth_token=%s; Path=/; HttpOnly", u.Token)
-		s.htmxRedirect(w, r, "/profile")
+		app.htmxRedirect(w, r, "/profile")
 		w.Header().Add("Set-Cookie", c)
 	}
 
-	tmpl.ExecuteTemplate(w, "layout", nil)
+	tmpl.ExecuteTemplate(w, "layout", app.templateData(r))
 }
 
-func (s *App) handleProfile(w http.ResponseWriter, r *http.Request) {
+func (app *App) handleProfile(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles(
 		"frontend/src/templates/layout.html",
 		"frontend/src/templates/profile.html",
 	))
 
-	tmpl.ExecuteTemplate(w, "layout", nil)
+	tmpl.ExecuteTemplate(w, "layout", app.templateData(r))
 }
 
-func (s *App) handleOverview(w http.ResponseWriter, r *http.Request) {
+func (app *App) handleOverview(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles(
 		"frontend/src/templates/layout.html",
 		"frontend/src/templates/overview.html",
 	))
 
-	tmpl.ExecuteTemplate(w, "layout", nil)
+	tmpl.ExecuteTemplate(w, "layout", app.templateData(r))
 }
 
-func (s *App) handleTracker(w http.ResponseWriter, r *http.Request) {
+func (app *App) handleTracker(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles(
 		"frontend/src/templates/fragments/tracker.html",
 	))
@@ -116,7 +121,7 @@ func (s *App) handleTracker(w http.ResponseWriter, r *http.Request) {
 	}
 
 	days := month(y, m)
-	ee := s.t.List()
+	ee := app.t.List()
 
 	next := time.Date(y, time.Month(m+1), 1, 0, 0, 0, 0, time.UTC)
 	prev := time.Date(y, time.Month(m-1), 1, 0, 0, 0, 0, time.UTC)
@@ -127,8 +132,8 @@ func (s *App) handleTracker(w http.ResponseWriter, r *http.Request) {
 		Next: MonthPeriod{Month: next.Month(), Year: next.Year()},
 	}
 
-	workforceStat := s.t.WorkforceStat(days, ee)
-	leavesStat := s.t.LeavesStat(days, ee)
+	workforceStat := app.t.WorkforceStat(days, ee)
+	leavesStat := app.t.LeavesStat(days, ee)
 
 	data := map[string]interface{}{
 		"Nav":           nav,
@@ -141,7 +146,7 @@ func (s *App) handleTracker(w http.ResponseWriter, r *http.Request) {
 	tmpl.ExecuteTemplate(w, "tracker.html", data)
 }
 
-func (s *App) handleDist(w http.ResponseWriter, r *http.Request) {
+func (app *App) handleDist(w http.ResponseWriter, r *http.Request) {
 	// TODO use embed:
 	b, err := os.ReadFile("frontend/dist/output.css")
 	if err != nil {
@@ -152,7 +157,7 @@ func (s *App) handleDist(w http.ResponseWriter, r *http.Request) {
 	w.Write(b)
 }
 
-func (s *App) handleLeaveApprove(w http.ResponseWriter, r *http.Request) {
+func (app *App) handleLeaveApprove(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		panic(err)
@@ -163,13 +168,13 @@ func (s *App) handleLeaveApprove(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	s.t.ApproveLeave(id)
+	app.t.ApproveLeave(id)
 
 	// send hx-trigger header to reload full tracker
 	w.Header().Add("HX-Trigger", "reloadTracker")
 }
 
-func (s *App) handleLeaveReject(w http.ResponseWriter, r *http.Request) {
+func (app *App) handleLeaveReject(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
 		panic(err)
@@ -180,12 +185,12 @@ func (s *App) handleLeaveReject(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	s.t.RejectLeave(id)
+	app.t.RejectLeave(id)
 	// send hx-trigger header to reload full tracker
 	w.Header().Add("HX-Trigger", "reloadTracker")
 }
 
-func (s *App) htmxRedirect(w http.ResponseWriter, r *http.Request, url string) {
+func (app *App) htmxRedirect(w http.ResponseWriter, r *http.Request, url string) {
 	w.Header().Add("HX-Redirect", url)
 }
 
@@ -241,4 +246,10 @@ func daysInYear(year int) int {
 
 func isLeap(year int) bool {
 	return year%4 == 0 && year%100 != 0 || year%400 == 0
+}
+
+func (app *App) templateData(r *http.Request) *TemplateData {
+	return &TemplateData{
+		IsAuthenticated: app.isAuthenticated(r),
+	}
 }

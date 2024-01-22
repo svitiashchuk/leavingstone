@@ -1,6 +1,7 @@
 package main
 
 import (
+	"leavingstone"
 	"leavingstone/sqlite"
 	"net/http"
 )
@@ -11,13 +12,13 @@ type Authenticator struct {
 	us *sqlite.UserService
 }
 
-func (auth *Authenticator) isAuthenticated(r *http.Request) bool {
+func (auth *Authenticator) authenticate(r *http.Request) *leavingstone.User {
 	for _, c := range r.Cookies() {
 		if c.Name == AuthCookie {
 			token := c.Value
 
 			if token == "" {
-				return false
+				return nil
 			}
 
 			u, err := auth.us.FindByToken(token)
@@ -25,9 +26,9 @@ func (auth *Authenticator) isAuthenticated(r *http.Request) bool {
 				panic(err)
 			}
 
-			return u != nil
+			return u
 		}
 	}
 
-	return false
+	return nil
 }
