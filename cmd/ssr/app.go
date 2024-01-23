@@ -38,7 +38,8 @@ type CommonFormTemplateData struct {
 
 type ProfileTemplateData struct {
 	CommonTemplateData
-	User *leavingstone.User
+	UpcomingLeaves []*leavingstone.Leave
+	User           *leavingstone.User
 }
 
 type TrackerTemplateData struct {
@@ -114,8 +115,14 @@ func (app *App) handleProfile(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
+	leaves, err := app.ls.Upcoming(app.userID(r))
+	if err != nil {
+		panic(err)
+	}
+
 	templateData := &ProfileTemplateData{
 		CommonTemplateData: *app.commonTemplateData(r),
+		UpcomingLeaves:     leaves,
 		User:               u,
 	}
 

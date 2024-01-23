@@ -40,6 +40,9 @@
         <h3 class="text-2xl font-bold h-3 mb-8">Upcoming Leaves</h2>
         <div class="overflow-y-auto">
             <ul class="steps steps-vertical">
+                {{ range .UpcomingLeaves }}
+                   <li data-content="✈" class="step step-success">{{ .Type }} on {{ .Start }} - {{ .End }} ({{ .Duration.Hours }} hours (should be days)</li>
+                {{ end }}
                 <li data-content="✈" class="step step-success">Vacation on 21 Jan - 24 Jan (3 days)</li>
                 <li data-content="✚" class="step step-warning">Sick day on 28 Jan (1 day)</li>
                 <li data-content="⧗" class="step step-info">Day off on 29 Jan (1 day)</li>
