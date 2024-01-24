@@ -68,6 +68,7 @@ func (ls *LeaveService) Upcoming(userID int) ([]*leavingstone.Leave, error) {
 		INNER JOIN users u ON l.user_id = u.id
 		WHERE l.user_id = ?
 		AND l.end >= ?
+		ORDER BY l.start ASC
 	`,
 		userID,
 		time.Now().Format(DBTimeFormat),

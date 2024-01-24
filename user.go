@@ -15,4 +15,5 @@ type User struct {
 
 type UserService interface {
 	AllUsers() ([]*User, error)
+	LeavesUsed(u *User, leaveTypes []string, periodStart, periodEnd *time.Time) int
 }

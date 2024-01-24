@@ -2,7 +2,10 @@ package sqlite
 
 import (
 	"database/sql"
+	"fmt"
 	"leavingstone"
+	"strings"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -23,10 +26,10 @@ func NewUserService() (*UserService, error) {
 }
 
 func (us *UserService) FindByID(id int) (*leavingstone.User, error) {
-	row := us.db.QueryRow("SELECT id, name, email, token, password FROM users WHERE id = ?", id)
+	row := us.db.QueryRow("SELECT id, name, email, token, password, start FROM users WHERE id = ?", id)
 
 	user := &leavingstone.User{}
-	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Token, &user.Password)
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Token, &user.Password, &user.Started)
 	if err != nil {
 		return nil, err
 	}
@@ -35,10 +38,10 @@ func (us *UserService) FindByID(id int) (*leavingstone.User, error) {
 }
 
 func (us *UserService) Find(email string) (*leavingstone.User, error) {
-	row := us.db.QueryRow("SELECT id, name, email, token, password FROM users WHERE email = ?", email)
+	row := us.db.QueryRow("SELECT id, name, email, token, password, start FROM users WHERE email = ?", email)
 
 	user := &leavingstone.User{}
-	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Token, &user.Password)
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Token, &user.Password, &user.Started)
 	if err != nil {
 		return nil, err
 	}
@@ -47,10 +50,10 @@ func (us *UserService) Find(email string) (*leavingstone.User, error) {
 }
 
 func (us *UserService) FindByToken(token string) (*leavingstone.User, error) {
-	row := us.db.QueryRow("SELECT id, name, email, token FROM users WHERE token = ?", token)
+	row := us.db.QueryRow("SELECT id, name, email, token, start FROM users WHERE token = ?", token)
 
 	user := &leavingstone.User{}
-	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Token)
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Token, &user.Started)
 	if err != nil {
 		return nil, err
 	}
@@ -109,4 +112,47 @@ func (us *UserService) AllUsers() ([]*leavingstone.User, error) {
 	}
 
 	return uu, nil
+}
+
+func (us *UserService) LeavesUsed(u *leavingstone.User, leaveTypes []string, periodStart, periodEnd *time.Time) int {
+	var used int
+
+	// gives ?,?,? for IN (?, ?, ?) if leaveTypes = []string{"vacation", "dayoff", "sick"}
+	leaveTypesPlaceholders := strings.Repeat("?,", len(leaveTypes)-1) + "?"
+
+	stmt := fmt.Sprintf(
+		`SELECT id, start, end, type, approved, user_id
+		FROM leaves
+		WHERE user_id = ? AND start >= ? AND end <= ? AND type IN (%s)`, leaveTypesPlaceholders)
+
+	args := []interface{}{u.ID, periodStart, periodEnd}
+	for _, leaveType := range leaveTypes {
+		args = append(args, leaveType)
+	}
+
+	rows, err := us.db.Query(stmt, args...)
+
+	if err != nil {
+		panic(err)
+	}
+
+	for rows.Next() {
+		l := leavingstone.Leave{}
+		err := rows.Scan(
+			&l.ID,
+			&l.Start,
+			&l.End,
+			&l.Type,
+			&l.Approved,
+			&l.UserID,
+		)
+		if err != nil {
+			panic(err)
+		}
+
+		used += int(l.Duration().Hours() / 24)
+	}
+	rows.Close()
+
+	return used
 }

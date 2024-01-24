@@ -26,6 +26,7 @@ type App struct {
 	us   *sqlite.UserService
 	ls   *sqlite.LeaveService
 	t    *tracker.Tracker
+	ac   *tracker.Accountant
 }
 
 type CommonTemplateData struct {
@@ -40,6 +41,12 @@ type ProfileTemplateData struct {
 	CommonTemplateData
 	UpcomingLeaves []*leavingstone.Leave
 	User           *leavingstone.User
+	VacationsMax   int
+	VacationsUsed  int
+	VacationsLeft  int
+	SickdaysMax    int
+	SickdaysUsed   int
+	SickdaysLeft   int
 }
 
 type TrackerTemplateData struct {
@@ -56,7 +63,6 @@ func (app *App) registerRoutes() {
 	http.HandleFunc("/", app.authenticate(app.requireAuth(app.handleIndex)))
 	http.HandleFunc("/plan-leave", app.authenticate(app.requireAuth(app.handlePlanLeave)))
 	http.HandleFunc("/profile", app.authenticate(app.requireAuth(app.handleProfile)))
-	http.HandleFunc("/tracker", app.authenticate(app.requireAuth(app.handleTracker)))
 	http.HandleFunc("/overview", app.authenticate(app.requireAuth(app.handleOverview)))
 
 	// assets for frontend
@@ -64,6 +70,10 @@ func (app *App) registerRoutes() {
 
 	http.HandleFunc("/leaves/approve", app.authenticate(app.requireAuth(app.handleLeaveApprove)))
 	http.HandleFunc("/leaves/reject", app.authenticate(app.requireAuth(app.handleLeaveReject)))
+
+	// fragments
+	http.HandleFunc("/fragments/tracker", app.authenticate(app.requireAuth(app.handleTracker)))
+	http.HandleFunc("/fragments/calendar", app.handleCalendar)
 }
 
 func (app *App) handleIndex(w http.ResponseWriter, r *http.Request) {
@@ -105,10 +115,15 @@ func (app *App) handleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) handleProfile(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles(
-		"frontend/src/templates/layout.html",
-		"frontend/src/templates/profile.html",
-	))
+	tmpl := template.Must(
+		template.
+			New("profile").
+			Funcs(templateFuncs()).
+			ParseFiles(
+				"frontend/src/templates/layout.html",
+				"frontend/src/templates/profile.html",
+			),
+	)
 
 	u, err := app.us.FindByID(app.userID(r))
 	if err != nil {
@@ -124,9 +139,18 @@ func (app *App) handleProfile(w http.ResponseWriter, r *http.Request) {
 		CommonTemplateData: *app.commonTemplateData(r),
 		UpcomingLeaves:     leaves,
 		User:               u,
+		VacationsMax:       app.ac.MaxVacationDays() + u.ExtraVacation,
+		VacationsLeft:      app.ac.VacationsLeft(u),
+		VacationsUsed:      app.ac.VacationsUsed(u),
+		SickdaysMax:        app.ac.MaxSickDays(),
+		SickdaysLeft:       app.ac.SickdaysLeft(u),
+		SickdaysUsed:       app.ac.SickdaysUsed(u),
 	}
 
-	tmpl.ExecuteTemplate(w, "layout", templateData)
+	err = tmpl.ExecuteTemplate(w, "layout", templateData)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (app *App) handlePlanLeave(w http.ResponseWriter, r *http.Request) {
@@ -136,17 +160,21 @@ func (app *App) handlePlanLeave(w http.ResponseWriter, r *http.Request) {
 		endDate := r.Form.Get("end_date")
 		leaveType := r.Form.Get("leave_type")
 
-		startDateParsed, err := time.Parse("2006-01-02", startDate)
+		// normalize dates so leave continues from 00:00 to 23:59
+		start, err := time.Parse("2006-01-02", startDate)
+		if err != nil {
+			panic(err)
+		}
+		start = time.Date(start.Year(), start.Month(), start.Day(), 0, 0, 0, 0, start.Location())
+
+		end, err := time.Parse("2006-01-02", endDate)
 		if err != nil {
 			panic(err)
 		}
 
-		endDateParsed, err := time.Parse("2006-01-02", endDate)
-		if err != nil {
-			panic(err)
-		}
+		end = time.Date(end.Year(), end.Month(), end.Day(), 23, 59, 59, 0, end.Location())
 
-		err = app.ls.Create(app.userID(r), startDateParsed, endDateParsed, leaveType)
+		err = app.ls.Create(app.userID(r), start, end, leaveType)
 		if err != nil {
 			panic(err)
 		}
@@ -267,6 +295,14 @@ func (app *App) handleLeaveReject(w http.ResponseWriter, r *http.Request) {
 	app.t.RejectLeave(id)
 	// send hx-trigger header to reload full tracker
 	w.Header().Add("HX-Trigger", "reloadTracker")
+}
+
+func (app *App) handleCalendar(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles(
+		"frontend/src/templates/fragments/calendar.html",
+	))
+
+	tmpl.ExecuteTemplate(w, "calendar.html", nil)
 }
 
 func (app *App) htmxRedirect(w http.ResponseWriter, r *http.Request, url string) {

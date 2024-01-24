@@ -1,8 +1,6 @@
 {{define "title"}}Home{{end}}
 
 {{define "main"}}
-<h1>Leaves Overview</h1>
-
 <div class="grid grid-cols-3 gap-4 not-prose p-8">
     <div class="col-span-2">
         <h2 class="mb-8">Upcoming Leaves</h2>
@@ -164,6 +162,7 @@
     </div>
     <div>
         <h2>Calendar</h2>
+        <div id="calendar" hx-get="/fragments/calendar" hx-trigger="revealed" hx-swap="innerHTML"></div>
     </div>
 </div>
 {{ end }}

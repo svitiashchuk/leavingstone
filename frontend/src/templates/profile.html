@@ -1,8 +1,6 @@
 {{define "title"}}Home{{end}}
 
 {{define "main"}}
-<h1>Profile</h1>
-
 <div class="grid grid-cols-3 gap-4 not-prose p-8">
     <div>
         <div class="card h-full w-96 bg-base-100 shadow-xl">
@@ -10,11 +8,11 @@
                 <div class="flex items-center space-x-4">
                     <div
                         class="relative inline-flex items-center justify-center m-3 w-16 h-16 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600 ring-2 ring-secondary">
-                        <span class="text-xl text-gray-600 dark:text-gray-300">JL</span>
+                        <span class="text-xl text-gray-600 dark:text-gray-300">{{ .User.Name | nameAbbrev }}</span>
                     </div>
                     <div class="text-xl dark:text-white">
                         <div>{{ .User.Name }}</div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Joined in August 2014</div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">Joined in {{ .User.Started | humanDate }}</div>
                     </div>
                 </div>
             </figure>
@@ -24,13 +22,13 @@
                 </h2>
                 <div class="card-actions">
                     <div class="w-full">
-                        <p>Days off and vacation: 12</p>
-                        <progress class="progress progress-primary w-full" value="78" max="100"></progress>
+                        <p>Days off and vacation: {{ .VacationsLeft }}</p>
+                        <progress class="progress progress-primary w-full" value="{{ calculatePercentage .VacationsLeft .VacationsMax }}" max="100"></progress>
                     </div>
 
                     <div class="w-full">
-                        <p>Sick days: 3</p>
-                        <progress class="progress progress-warning w-full" value="44" max="100"></progress>
+                        <p>Sick days: {{ .SickdaysLeft }}</p>
+                        <progress class="progress progress-warning w-full" value="{{ calculatePercentage .SickdaysLeft .SickdaysMax }}" max="100"></progress>
                     </div>
                 </div>
             </div>
@@ -41,13 +39,15 @@
         <div class="overflow-y-auto">
             <ul class="steps steps-vertical">
                 {{ range .UpcomingLeaves }}
-                   <li data-content="✈" class="step step-success">{{ .Type }} on {{ .Start }} - {{ .End }} ({{ .Duration.Hours }} hours (should be days)</li>
+                <li data-content="{{ . | leaveTypeSign }}" class="step step-{{ . | leaveTypeColor }}">
+                    {{ .Type }} on 
+                    {{ .Start | humanDate }} - {{ .End | humanDate }} 
+                    ({{ . | leaveDays }} days) - 
+                    {{ if .Approved }} [Approved] {{ else }} [Pending] {{ end }}
+                </li>
                 {{ end }}
-                <li data-content="✈" class="step step-success">Vacation on 21 Jan - 24 Jan (3 days)</li>
-                <li data-content="✚" class="step step-warning">Sick day on 28 Jan (1 day)</li>
-                <li data-content="⧗" class="step step-info">Day off on 29 Jan (1 day)</li>
             </ul>
-        </div>
+        </div>  
     </div>
 </div>
 {{ end }}

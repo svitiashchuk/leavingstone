@@ -1,6 +1,9 @@
 package main
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type MonthPeriod struct {
 	Month time.Month
@@ -9,6 +12,31 @@ type MonthPeriod struct {
 
 func (mp MonthPeriod) MonthNum() int {
 	return int(mp.Month)
+}
+
+func calendarMonth() {
+	y := 2023
+	m := time.Month(3)
+
+	firstDayOfMonth := time.Date(y, m, 1, 0, 0, 0, 0, time.UTC)
+	diffDaysToWeekStart := firstDayOfMonth.Weekday() - time.Monday
+	firstDayForCalendar := time.Date(y, m, 1-int(diffDaysToWeekStart), 0, 0, 0, 0, time.UTC)
+
+	lastDayOfMonth := time.Date(y, m+1, 0, 0, 0, 0, 0, time.UTC)
+	diffDaysToWeekEnd := 7 - lastDayOfMonth.Weekday()
+	lastDayForCalendar := time.Date(y, m+1, int(diffDaysToWeekEnd), 0, 0, 0, 0, time.UTC)
+
+	fmt.Print("Mo\tTu\tWe\tTh\tFr\tSa\tSu\n")
+
+	d := firstDayForCalendar
+	for i := 0; !d.After(lastDayForCalendar); i += 1 {
+		fmt.Printf("%d\t", d.Day())
+		if d.Weekday() == time.Sunday {
+			fmt.Println()
+		}
+
+		d = d.AddDate(0, 0, 1)
+	}
 }
 
 func month(year, month int) []time.Time {

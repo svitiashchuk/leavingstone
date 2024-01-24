@@ -18,6 +18,8 @@ func main() {
 		panic(err)
 	}
 
+	ac := tracker.NewAccountant(us)
+
 	auth := &Authenticator{
 		us: us,
 	}
@@ -30,6 +32,7 @@ func main() {
 		us:   us,
 		ls:   ls,
 		t:    t,
+		ac:   ac,
 	}
 
 	app.registerRoutes()
