@@ -14,12 +14,16 @@ func (mp MonthPeriod) MonthNum() int {
 	return int(mp.Month)
 }
 
-func calendarMonth() {
-	y := 2023
-	m := time.Month(3)
+func calendarMonth(year, month int) [][]time.Time {
+	y := year
+	m := time.Month(month)
 
+	// TODO problem with September 2024, where first day is Sunday
 	firstDayOfMonth := time.Date(y, m, 1, 0, 0, 0, 0, time.UTC)
 	diffDaysToWeekStart := firstDayOfMonth.Weekday() - time.Monday
+	if (diffDaysToWeekStart) < 0 {
+		diffDaysToWeekStart = 7 + diffDaysToWeekStart
+	}
 	firstDayForCalendar := time.Date(y, m, 1-int(diffDaysToWeekStart), 0, 0, 0, 0, time.UTC)
 
 	lastDayOfMonth := time.Date(y, m+1, 0, 0, 0, 0, 0, time.UTC)
@@ -28,15 +32,24 @@ func calendarMonth() {
 
 	fmt.Print("Mo\tTu\tWe\tTh\tFr\tSa\tSu\n")
 
+	monthWeeks := [][]time.Time{}
+	monthWeeks = append(monthWeeks, []time.Time{})
+
+	currentWeek := 0
 	d := firstDayForCalendar
 	for i := 0; !d.After(lastDayForCalendar); i += 1 {
+		monthWeeks[currentWeek] = append(monthWeeks[currentWeek], d)
 		fmt.Printf("%d\t", d.Day())
 		if d.Weekday() == time.Sunday {
-			fmt.Println()
+			currentWeek += 1
+			monthWeeks = append(monthWeeks, []time.Time{})
+			fmt.Print("\n")
 		}
 
 		d = d.AddDate(0, 0, 1)
 	}
+
+	return monthWeeks
 }
 
 func month(year, month int) []time.Time {

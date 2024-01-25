@@ -58,6 +58,21 @@ type TrackerTemplateData struct {
 	LeavesStat    *tracker.LeavesStat
 }
 
+type CalendarTemplateData struct {
+	CommonTemplateData
+	Today         time.Time
+	Weekdays      []string
+	MonthWeekDays [][]time.Time
+	SelectedYear  int
+	SelectedMonth time.Month
+	Nav           CalendarNav
+}
+
+type CalendarNav struct {
+	Prev MonthPeriod
+	Next MonthPeriod
+}
+
 func (app *App) registerRoutes() {
 	http.HandleFunc("/login", app.handleLogin)
 	http.HandleFunc("/", app.authenticate(app.requireAuth(app.handleIndex)))
@@ -73,7 +88,7 @@ func (app *App) registerRoutes() {
 
 	// fragments
 	http.HandleFunc("/tracker", app.authenticate(app.requireAuth(app.handleTracker)))
-	http.HandleFunc("/fragments/calendar", app.handleCalendar)
+	http.HandleFunc("/fragments/calendar", app.authenticate(app.requireAuth(app.handleCalendar)))
 }
 
 func (app *App) handleIndex(w http.ResponseWriter, r *http.Request) {
@@ -298,11 +313,49 @@ func (app *App) handleLeaveReject(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) handleCalendar(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles(
-		"frontend/src/templates/fragments/calendar.html",
-	))
+	tmpl := template.Must(
+		template.
+			New("calendar").
+			Funcs(templateFuncs()).
+			ParseFiles(
+				"frontend/src/templates/fragments/calendar.html",
+			),
+	)
 
-	tmpl.ExecuteTemplate(w, "calendar.html", nil)
+	monthNum, err := strconv.Atoi(r.URL.Query().Get("month"))
+	if err != nil {
+		monthNum = int(time.Now().Month())
+	}
+	selectedMonth := time.Month(monthNum)
+
+	selectedYear, err := strconv.Atoi(r.URL.Query().Get("year"))
+	if err != nil {
+		selectedYear = time.Now().Year()
+	}
+
+	data := &CalendarTemplateData{
+		CommonTemplateData: *app.commonTemplateData(r),
+		Weekdays:           []string{"Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"},
+		MonthWeekDays:      calendarMonth(selectedYear, int(selectedMonth)),
+		SelectedYear:       selectedYear,
+		SelectedMonth:      selectedMonth,
+		Today:              time.Now(),
+		Nav: CalendarNav{
+			Prev: MonthPeriod{
+				Month: time.Month((int(selectedMonth)+10)%12 + 1),
+				Year:  selectedYear,
+			},
+			Next: MonthPeriod{
+				Month: time.Month((int(selectedMonth) + 1) % 12),
+				Year:  selectedYear,
+			},
+		},
+	}
+
+	err = tmpl.ExecuteTemplate(w, "calendar.html", data)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (app *App) htmxRedirect(w http.ResponseWriter, r *http.Request, url string) {

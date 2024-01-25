@@ -55,5 +55,8 @@ func templateFuncs() template.FuncMap {
 				}
 			}, s)
 		},
+		"monthNum": func(m time.Month) int {
+			return int(m)
+		},
 	}
 }
