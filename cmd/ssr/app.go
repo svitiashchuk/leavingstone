@@ -72,7 +72,7 @@ func (app *App) registerRoutes() {
 	http.HandleFunc("/leaves/reject", app.authenticate(app.requireAuth(app.handleLeaveReject)))
 
 	// fragments
-	http.HandleFunc("/fragments/tracker", app.authenticate(app.requireAuth(app.handleTracker)))
+	http.HandleFunc("/tracker", app.authenticate(app.requireAuth(app.handleTracker)))
 	http.HandleFunc("/fragments/calendar", app.handleCalendar)
 }
 
