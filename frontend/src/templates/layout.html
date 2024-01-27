@@ -14,44 +14,61 @@
 </head>
 
 <body>
-    <div class="navbar bg-base-100">
-        <div class="navbar-start">
-          <div class="dropdown">
-            <label tabindex="0" class="btn btn-ghost lg:hidden">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
-            </label>
-            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-              <li><a href="/">Team Overview</a></li>
-              <li><a href="/overview"></a></li>
-              <li><a href="/profile">Profile</a></li>
-            </ul>
-          </div>
-          <a class="btn btn-ghost text-xl" href="/">LeavingStone</a>
-        </div>
-        <div class="navbar-center hidden lg:flex">
-          <ul class="menu menu-horizontal px-1">
-            <li><a href="/">Tracker</a></li>
-            <li><a href="/overview">Team Overview</a></li>
-            <li><a href="/profile">Profile</a></li>
-          </ul>
-        </div>
-        <div class="navbar-end">
-          {{ if not .IsAuthenticated }}
-          <a class="btn" href="/login">Login</a>
-          {{ else }}
-          <a class="btn" href="/plan-leave">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-            </svg>            
-            Plan a leave
-          </a>
-          {{ end }}
-        </div>
+  <div class="navbar bg-base-100">
+    <div class="navbar-start">
+      <div class="dropdown">
+        <label tabindex="0" class="btn btn-ghost lg:hidden">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /></svg>
+        </label>
+        <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+          <li><a href="/">Team Overview</a></li>
+          <li><a href="/overview"></a></li>
+          <li><a href="/profile">Profile</a></li>
+        </ul>
       </div>
-    <div class="container mx-auto prose max-w-screen-2xl px-1 py-2">
-        {{ block "main" . }}
-        {{ end }}
+      <a class="btn btn-ghost text-xl" href="/">LeavingStone</a>
     </div>
+    <div class="navbar-center hidden lg:flex">
+      <ul class="menu menu-horizontal px-1">
+        <li><a href="/">Tracker</a></li>
+        <li><a href="/overview">Team Overview</a></li>
+        <li><a href="/profile">Profile</a></li>
+      </ul>
+    </div>
+    <div class="navbar-end">
+      {{ if .IsAuthenticated }}
+      <a class="btn" href="/plan-leave">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>            
+        Plan a leave
+      </a>
+      <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+          <div class="w-10 rounded-full">
+            <img alt="Profile picture" src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+          </div>
+        </div>
+        <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+          <li>
+            <a class="justify-between" href="/profile">
+              Profile
+              <span class="badge badge-warning">1</span>
+            </a>
+          </li>
+          <li><a href="/settings">Settings</a></li>
+          <li><a href="/logout">Logout</a></li>
+        </ul>
+      </div>
+      {{ else }}
+      <a class="btn" href="/login">Login</a>
+      {{ end }}
+    </div>
+  </div>
+  <div class="container mx-auto max-w-screen-2xl px-4 py-2">
+      {{ block "main" . }}
+      {{ end }}
+  </div>
 </body>
 
 </html>

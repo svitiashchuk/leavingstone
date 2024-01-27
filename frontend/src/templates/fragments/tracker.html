@@ -79,7 +79,12 @@
                         <summary class="block flex-grow">&nbsp;</summary>
                         <div class="shadow menu dropdown-content z-[100] card card-compact w-96 bg-primary rounded-box">
                             <div class="card-body">
-                                <h3 class="card-title">Leave approval</h3>
+                                <div class="card-actions justify-between">
+                                <h2 class="card-title">Leave approval</h2>
+                                    <button class="btn btn-square btn-ghost btn-sm" onclick="this.closest('.dropdown').removeAttribute('open');">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                    </button>
+                                </div>
                                 <p class="prose text-primary-content">You can approve or reject requested leave.</p>
                                 <div class="card-actions justify-end">
                                     <button class="btn btn-circle btn-outline border-2" hx-post="/leaves/approve"
