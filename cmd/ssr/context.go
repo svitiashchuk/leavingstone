@@ -9,7 +9,12 @@ const isAuthenticatedContextKey = contextKey("isAuthenticated")
 const userIDContextKey = contextKey("userID")
 
 func (app *App) isAuthenticated(r *http.Request) bool {
-	isAuthenticated := r.Context().Value(isAuthenticatedContextKey).(bool)
+	v := r.Context().Value(isAuthenticatedContextKey)
+	if v == nil {
+		return false
+	}
+
+	isAuthenticated := v.(bool)
 	return isAuthenticated
 }
 

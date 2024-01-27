@@ -75,6 +75,7 @@ type CalendarNav struct {
 
 func (app *App) registerRoutes() {
 	http.HandleFunc("/login", app.handleLogin)
+	http.HandleFunc("/logout", app.handleLogout)
 	http.HandleFunc("/", app.authenticate(app.requireAuth(app.handleIndex)))
 	http.HandleFunc("/plan-leave", app.authenticate(app.requireAuth(app.handlePlanLeave)))
 	http.HandleFunc("/profile", app.authenticate(app.requireAuth(app.handleProfile)))
@@ -122,11 +123,17 @@ func (app *App) handleLogin(w http.ResponseWriter, r *http.Request) {
 		}
 
 		c := fmt.Sprintf("auth_token=%s; Path=/; HttpOnly", u.Token)
-		app.htmxRedirect(w, r, "/profile")
 		w.Header().Add("Set-Cookie", c)
+
+		http.Redirect(w, r, "/overview", http.StatusFound)
 	}
 
 	tmpl.ExecuteTemplate(w, "layout", app.commonTemplateData(r))
+}
+
+func (app *App) handleLogout(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Set-Cookie", "auth_token=; Path=/; HttpOnly")
+	http.Redirect(w, r, "/login", http.StatusFound)
 }
 
 func (app *App) handleProfile(w http.ResponseWriter, r *http.Request) {
