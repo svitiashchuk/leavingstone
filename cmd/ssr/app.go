@@ -31,6 +31,7 @@ type App struct {
 
 type CommonTemplateData struct {
 	IsAuthenticated bool
+	Alert           string
 }
 
 type CommonFormTemplateData struct {
@@ -77,9 +78,9 @@ func (app *App) registerRoutes() {
 	http.HandleFunc("/login", app.handleLogin)
 	http.HandleFunc("/logout", app.handleLogout)
 	http.HandleFunc("/", app.authenticate(app.requireAuth(app.handleIndex)))
-	http.HandleFunc("/plan-leave", app.authenticate(app.requireAuth(app.handlePlanLeave)))
+	http.HandleFunc("/plan-leave", app.session(app.authenticate(app.requireAuth(app.handlePlanLeave))))
 	http.HandleFunc("/profile", app.authenticate(app.requireAuth(app.handleProfile)))
-	http.HandleFunc("/overview", app.authenticate(app.requireAuth(app.handleOverview)))
+	http.HandleFunc("/overview", app.session(app.authenticate(app.requireAuth(app.handleOverview))))
 
 	// assets for frontend
 	http.HandleFunc("/dist/", app.handleDist)
@@ -201,8 +202,7 @@ func (app *App) handlePlanLeave(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 
-		// TODO: app.sm.SetFlash(w, "Leave request created successfully")
-		// simple http redirect
+		app.sm.Get(r.Context().Value(sessionContextKey).(string)).Flash("Leave planned!")
 		http.Redirect(w, r, "/overview", http.StatusFound)
 	} else {
 		// Render the form for planning leave
@@ -370,7 +370,18 @@ func (app *App) htmxRedirect(w http.ResponseWriter, r *http.Request, url string)
 }
 
 func (app *App) commonTemplateData(r *http.Request) *CommonTemplateData {
+	var alert string
+
+	ctxVal := r.Context().Value(sessionContextKey)
+	if ctxVal != nil {
+		session := app.sm.Get(ctxVal.(string))
+		if session != nil {
+			alert = session.GetFlash()
+		}
+	}
+
 	return &CommonTemplateData{
 		IsAuthenticated: app.isAuthenticated(r),
+		Alert:           alert,
 	}
 }

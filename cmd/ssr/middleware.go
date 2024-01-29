@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"math/rand"
 	"net/http"
+	"strconv"
 )
 
 func (app *App) requireAuth(next http.HandlerFunc) http.HandlerFunc {
@@ -33,5 +35,41 @@ func (app *App) authenticate(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		next(w, r)
+	}
+}
+
+func (app *App) session(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		c := r.Cookies()
+
+		for _, cookie := range c {
+			if cookie.Name == "session_id" {
+				s := app.sm.Get(cookie.Value)
+				if s != nil {
+					ctx := r.Context()
+					ctx = context.WithValue(ctx, sessionContextKey, cookie.Value)
+
+					next(w, r.WithContext(ctx))
+					return
+				}
+			}
+		}
+
+		sessionID := strconv.Itoa(rand.Intn(1000000000))
+		_, err := app.sm.Create(sessionID)
+		if err != nil {
+			panic(err)
+		}
+
+		http.SetCookie(w, &http.Cookie{
+			Name:  "session_id",
+			Value: sessionID,
+			Path:  "/",
+		})
+
+		ctx := r.Context()
+		ctx = context.WithValue(ctx, sessionContextKey, sessionID)
+
+		next(w, r.WithContext(ctx))
 	}
 }

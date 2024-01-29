@@ -37,14 +37,12 @@ type Session struct {
 	vals map[string]string
 }
 
-func get(k string) error {
-	return errors.New("not implemented")
+func (s *Session) Flash(msg string) {
+	s.vals["flash"] = msg
 }
 
-func set(k string, v string) error {
-	return errors.New("not implemented")
-}
-
-func del(k string) error {
-	return errors.New("not implemented")
+func (s *Session) GetFlash() string {
+	msg := s.vals["flash"]
+	delete(s.vals, "flash")
+	return msg
 }

@@ -4,8 +4,8 @@ import "net/http"
 
 type contextKey string
 
+const sessionContextKey = contextKey("session")
 const isAuthenticatedContextKey = contextKey("isAuthenticated")
-
 const userIDContextKey = contextKey("userID")
 
 func (app *App) isAuthenticated(r *http.Request) bool {
