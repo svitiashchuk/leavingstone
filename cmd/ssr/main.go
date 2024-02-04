@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"leavingstone/internal/pkg/tracker"
+	"leavingstone/pkg/tracker"
 	"leavingstone/sqlite"
 	"net/http"
 )

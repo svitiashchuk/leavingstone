@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"leavingstone/internal/pkg/tracker"
+	"leavingstone/pkg/tracker"
 	"leavingstone/sqlite"
 	"net/http"
 )
@@ -22,8 +22,8 @@ func main() {
 	t := tracker.NewTracker(us, ls)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-    w.Write([]byte("Hello world"))
-  })
+		w.Write([]byte("Hello world"))
+	})
 
 	http.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
 		uu, err := us.AllUsers()

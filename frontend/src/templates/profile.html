@@ -42,7 +42,7 @@
                 <li data-content="{{ . | leaveTypeSign }}" class="step step-{{ . | leaveTypeColor }}">
                     {{ .Type }} on 
                     {{ .Start | humanDate }} - {{ .End | humanDate }} 
-                    ({{ . | leaveDays }} days) - 
+                    ({{ .DurationDays }} days) - 
                     {{ if .Approved }} [Approved] {{ else }} [Pending] {{ end }}
                 </li>
                 {{ end }}

@@ -14,9 +14,6 @@ func templateFuncs() template.FuncMap {
 		"humanDate": func(t time.Time) string {
 			return t.Format("02 Jan")
 		},
-		"leaveDays": func(l leavingstone.Leave) int {
-			return int(math.Round(l.Duration().Hours() / 24))
-		},
 		"leaveTypeSign": func(l leavingstone.Leave) string {
 			if l.Type == "vacation" {
 				return "✈"

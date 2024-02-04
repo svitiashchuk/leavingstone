@@ -100,6 +100,58 @@ func (ls *LeaveService) Upcoming(userID int) ([]*leavingstone.Leave, error) {
 	return ll, nil
 }
 
+func (ls *LeaveService) AllUpcoming() ([]*leavingstone.Leave, error) {
+	rows, err := ls.db.Query(`
+		SELECT
+		l.id, l.user_id, l.start, l.end, l.type, l.approved, u.id, u.name, u.email, u.token, u.start, u.extra_vacation
+		FROM leaves l
+		INNER JOIN users u ON l.user_id = u.id
+		WHERE l.end >= ?
+		ORDER BY l.start ASC
+	`,
+		time.Now().Format(DBTimeFormat),
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	users := map[int]*leavingstone.User{}
+	ll := []*leavingstone.Leave{}
+	for rows.Next() {
+		u := leavingstone.User{}
+
+		leave := leavingstone.Leave{}
+		err = rows.Scan(
+			&leave.ID,
+			&leave.UserID,
+			&leave.Start,
+			&leave.End,
+			&leave.Type,
+			&leave.Approved,
+			&u.ID,
+			&u.Name,
+			&u.Email,
+			&u.Token,
+			&u.Started,
+			&u.ExtraVacation,
+		)
+
+		if _, ok := users[u.ID]; !ok {
+			users[u.ID] = &u
+		}
+		leave.User = users[u.ID]
+
+		if err != nil {
+			return nil, err
+		}
+
+		ll = append(ll, &leave)
+	}
+
+	return ll, nil
+}
+
 func (ls *LeaveService) Create(userID int, from, to time.Time, leaveType string) error {
 	_, err := ls.db.Exec(
 		`INSERT INTO leaves (start, end, user_id, type, approved) VALUES(?, ?, ?, ?, ?)`,

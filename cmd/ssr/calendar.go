@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -30,7 +29,7 @@ func calendarMonth(year, month int) [][]time.Time {
 	diffDaysToWeekEnd := 7 - lastDayOfMonth.Weekday()
 	lastDayForCalendar := time.Date(y, m+1, int(diffDaysToWeekEnd), 0, 0, 0, 0, time.UTC)
 
-	fmt.Print("Mo\tTu\tWe\tTh\tFr\tSa\tSu\n")
+	// fmt.Print("Mo\tTu\tWe\tTh\tFr\tSa\tSu\n")
 
 	monthWeeks := [][]time.Time{}
 	monthWeeks = append(monthWeeks, []time.Time{})
@@ -39,11 +38,11 @@ func calendarMonth(year, month int) [][]time.Time {
 	d := firstDayForCalendar
 	for i := 0; !d.After(lastDayForCalendar); i += 1 {
 		monthWeeks[currentWeek] = append(monthWeeks[currentWeek], d)
-		fmt.Printf("%d\t", d.Day())
+		// fmt.Printf("%d\t", d.Day())
 		if d.Weekday() == time.Sunday {
 			currentWeek += 1
 			monthWeeks = append(monthWeeks, []time.Time{})
-			fmt.Print("\n")
+			//fmt.Print("\n")
 		}
 
 		d = d.AddDate(0, 0, 1)

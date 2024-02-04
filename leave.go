@@ -1,6 +1,9 @@
 package leavingstone
 
-import "time"
+import (
+	"math"
+	"time"
+)
 
 type Leave struct {
 	ID       int
@@ -9,14 +12,15 @@ type Leave struct {
 	End      time.Time
 	Approved bool
 	UserID   int
+	User     *User
 }
 
 func (l *Leave) Duration() time.Duration {
 	return l.End.Sub(l.Start)
 }
 
-func (l *Leave) DurationDays() time.Duration {
-	return l.End.Sub(l.Start)
+func (l *Leave) DurationDays() int {
+	return int(math.Round(l.Duration().Hours() / 24))
 }
 
 type LeaveService interface {

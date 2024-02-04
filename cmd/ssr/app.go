@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"leavingstone"
-	"leavingstone/internal/pkg/tracker"
+	"leavingstone/pkg/tracker"
 	"leavingstone/sqlite"
 	"net/http"
 	"os"
@@ -67,6 +67,11 @@ type CalendarTemplateData struct {
 	SelectedYear  int
 	SelectedMonth time.Month
 	Nav           CalendarNav
+}
+
+type OverviewTemplateData struct {
+	CommonTemplateData
+	UpcomingLeaves []*leavingstone.Leave
 }
 
 type CalendarNav struct {
@@ -228,12 +233,30 @@ func (app *App) handlePlanLeave(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) handleOverview(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles(
-		"frontend/src/templates/layout.html",
-		"frontend/src/templates/overview.html",
-	))
+	tmpl := template.Must(
+		template.
+			New("overview").
+			Funcs(templateFuncs()).
+			ParseFiles(
+				"frontend/src/templates/layout.html",
+				"frontend/src/templates/overview.html",
+			),
+	)
 
-	tmpl.ExecuteTemplate(w, "layout", app.commonTemplateData(r))
+	ll, err := app.ls.AllUpcoming()
+	if err != nil {
+		panic(err)
+	}
+
+	data := &OverviewTemplateData{
+		CommonTemplateData: *app.commonTemplateData(r),
+		UpcomingLeaves:     ll,
+	}
+
+	err = tmpl.ExecuteTemplate(w, "layout", data)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (app *App) handleTracker(w http.ResponseWriter, r *http.Request) {
