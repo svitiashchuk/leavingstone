@@ -1,6 +1,5 @@
-<div class="flex justify-between">
+<div class="flex justify-between mb-5 mt-5">
     <div>
-        <h3>Report for {{ .Nav.Now.Month }} {{ .Nav.Now.Year }}</h3>
         <div class="join">
             <a class="join-item btn" aria-label="Previous" hx-trigger="click" hx-target="#tracker-container"
                 hx-swap="innerHTML" hx-get="/tracker?year={{ .Nav.Prev.Year }}&month={{ .Nav.Prev.MonthNum }}">«</a>
