@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"leavingstone"
-	"leavingstone/pkg/tracker"
-	"leavingstone/sqlite"
+	"leavingstone/internal/model"
+	"leavingstone/internal/sqlite"
+	"leavingstone/internal/tracker"
 	"net/http"
 	"os"
 	"strconv"
@@ -40,8 +40,8 @@ type CommonFormTemplateData struct {
 
 type ProfileTemplateData struct {
 	CommonTemplateData
-	UpcomingLeaves []*leavingstone.Leave
-	User           *leavingstone.User
+	UpcomingLeaves []*model.Leave
+	User           *model.User
 	VacationsMax   int
 	VacationsUsed  int
 	VacationsLeft  int
@@ -71,7 +71,7 @@ type CalendarTemplateData struct {
 
 type OverviewTemplateData struct {
 	CommonTemplateData
-	UpcomingLeaves []*leavingstone.Leave
+	UpcomingLeaves []*model.Leave
 }
 
 type CalendarNav struct {

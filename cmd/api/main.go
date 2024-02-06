@@ -3,8 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"leavingstone/pkg/tracker"
-	"leavingstone/sqlite"
+	"leavingstone/internal/sqlite"
+	"leavingstone/internal/tracker"
 	"net/http"
 )
 

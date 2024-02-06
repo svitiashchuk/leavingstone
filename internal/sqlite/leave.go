@@ -2,7 +2,7 @@ package sqlite
 
 import (
 	"database/sql"
-	"leavingstone"
+	"leavingstone/internal/model"
 	"time"
 )
 
@@ -22,7 +22,7 @@ func NewLeaveService() (*LeaveService, error) {
 	return &LeaveService{db}, nil
 }
 
-func (ls *LeaveService) List(from, to time.Time, limit int) ([]*leavingstone.Leave, error) {
+func (ls *LeaveService) List(from, to time.Time, limit int) ([]*model.Leave, error) {
 	rows, err := ls.db.Query(`
 		SELECT
 		l.id, l.user_id, l.start, l.end, l.type, l.approved
@@ -38,9 +38,9 @@ func (ls *LeaveService) List(from, to time.Time, limit int) ([]*leavingstone.Lea
 		return nil, err
 	}
 
-	ll := []*leavingstone.Leave{}
+	ll := []*model.Leave{}
 	for rows.Next() {
-		leave := leavingstone.Leave{}
+		leave := model.Leave{}
 		err = rows.Scan(
 			&leave.ID,
 			&leave.UserID,
@@ -60,7 +60,7 @@ func (ls *LeaveService) List(from, to time.Time, limit int) ([]*leavingstone.Lea
 	return ll, nil
 }
 
-func (ls *LeaveService) Upcoming(userID int) ([]*leavingstone.Leave, error) {
+func (ls *LeaveService) Upcoming(userID int) ([]*model.Leave, error) {
 	rows, err := ls.db.Query(`
 		SELECT
 		l.id, l.user_id, l.start, l.end, l.type, l.approved
@@ -78,9 +78,9 @@ func (ls *LeaveService) Upcoming(userID int) ([]*leavingstone.Leave, error) {
 		return nil, err
 	}
 
-	ll := []*leavingstone.Leave{}
+	ll := []*model.Leave{}
 	for rows.Next() {
-		leave := leavingstone.Leave{}
+		leave := model.Leave{}
 		err = rows.Scan(
 			&leave.ID,
 			&leave.UserID,
@@ -100,7 +100,7 @@ func (ls *LeaveService) Upcoming(userID int) ([]*leavingstone.Leave, error) {
 	return ll, nil
 }
 
-func (ls *LeaveService) AllUpcoming() ([]*leavingstone.Leave, error) {
+func (ls *LeaveService) AllUpcoming() ([]*model.Leave, error) {
 	rows, err := ls.db.Query(`
 		SELECT
 		l.id, l.user_id, l.start, l.end, l.type, l.approved, u.id, u.name, u.email, u.token, u.start, u.extra_vacation
@@ -116,12 +116,12 @@ func (ls *LeaveService) AllUpcoming() ([]*leavingstone.Leave, error) {
 		return nil, err
 	}
 
-	users := map[int]*leavingstone.User{}
-	ll := []*leavingstone.Leave{}
+	users := map[int]*model.User{}
+	ll := []*model.Leave{}
 	for rows.Next() {
-		u := leavingstone.User{}
+		u := model.User{}
 
-		leave := leavingstone.Leave{}
+		leave := model.Leave{}
 		err = rows.Scan(
 			&leave.ID,
 			&leave.UserID,

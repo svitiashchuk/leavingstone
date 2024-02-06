@@ -1,4 +1,4 @@
-package leavingstone
+package model
 
 type CompanyPolicy struct {
 	MaxVacationDays int

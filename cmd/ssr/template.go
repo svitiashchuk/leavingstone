@@ -2,7 +2,7 @@ package main
 
 import (
 	"html/template"
-	"leavingstone"
+	"leavingstone/internal/model"
 	"math"
 	"strings"
 	"time"
@@ -14,7 +14,7 @@ func templateFuncs() template.FuncMap {
 		"humanDate": func(t time.Time) string {
 			return t.Format("02 Jan")
 		},
-		"leaveTypeSign": func(l leavingstone.Leave) string {
+		"leaveTypeSign": func(l model.Leave) string {
 			if l.Type == "vacation" {
 				return "✈"
 			}
@@ -27,7 +27,7 @@ func templateFuncs() template.FuncMap {
 
 			panic("unknown leave type")
 		},
-		"leaveTypeColor": func(l leavingstone.Leave) string {
+		"leaveTypeColor": func(l model.Leave) string {
 			if l.Type == "vacation" {
 				return "accent"
 			}

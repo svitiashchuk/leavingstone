@@ -1,4 +1,4 @@
-package leavingstone
+package model
 
 import "time"
 

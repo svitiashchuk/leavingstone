@@ -3,7 +3,7 @@ package sqlite
 import (
 	"database/sql"
 	"fmt"
-	"leavingstone"
+	"leavingstone/internal/model"
 	"strings"
 	"time"
 
@@ -25,10 +25,10 @@ func NewUserService() (*UserService, error) {
 	return &UserService{db}, nil
 }
 
-func (us *UserService) FindByID(id int) (*leavingstone.User, error) {
+func (us *UserService) FindByID(id int) (*model.User, error) {
 	row := us.db.QueryRow("SELECT id, name, email, token, password, start FROM users WHERE id = ?", id)
 
-	user := &leavingstone.User{}
+	user := &model.User{}
 	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Token, &user.Password, &user.Started)
 	if err != nil {
 		return nil, err
@@ -37,10 +37,10 @@ func (us *UserService) FindByID(id int) (*leavingstone.User, error) {
 	return user, nil
 }
 
-func (us *UserService) Find(email string) (*leavingstone.User, error) {
+func (us *UserService) Find(email string) (*model.User, error) {
 	row := us.db.QueryRow("SELECT id, name, email, token, password, start FROM users WHERE email = ?", email)
 
-	user := &leavingstone.User{}
+	user := &model.User{}
 	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Token, &user.Password, &user.Started)
 	if err != nil {
 		return nil, err
@@ -49,10 +49,10 @@ func (us *UserService) Find(email string) (*leavingstone.User, error) {
 	return user, nil
 }
 
-func (us *UserService) FindByToken(token string) (*leavingstone.User, error) {
+func (us *UserService) FindByToken(token string) (*model.User, error) {
 	row := us.db.QueryRow("SELECT id, name, email, token, start FROM users WHERE token = ?", token)
 
-	user := &leavingstone.User{}
+	user := &model.User{}
 	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Token, &user.Started)
 	if err != nil {
 		return nil, err
@@ -61,8 +61,8 @@ func (us *UserService) FindByToken(token string) (*leavingstone.User, error) {
 	return user, nil
 }
 
-func (us *UserService) AllUsers() ([]*leavingstone.User, error) {
-	uu := []*leavingstone.User{}
+func (us *UserService) AllUsers() ([]*model.User, error) {
+	uu := []*model.User{}
 
 	rows, err := us.db.Query(`
 		SELECT u.id, u.name, u.email, u.token, u.start, u.extra_vacation, l.id, l.start, l.end, l.type, l.approved, l.user_id
@@ -75,11 +75,11 @@ func (us *UserService) AllUsers() ([]*leavingstone.User, error) {
 	}
 
 	// Map to store users by ID and collect leaves as child field for each user
-	users := map[int]*leavingstone.User{}
+	users := map[int]*model.User{}
 
 	for rows.Next() {
-		user := leavingstone.User{}
-		leave := leavingstone.Leave{}
+		user := model.User{}
+		leave := model.Leave{}
 
 		err := rows.Scan(
 			&user.ID,
@@ -114,7 +114,7 @@ func (us *UserService) AllUsers() ([]*leavingstone.User, error) {
 	return uu, nil
 }
 
-func (us *UserService) LeavesUsed(u *leavingstone.User, leaveTypes []string, periodStart, periodEnd *time.Time) int {
+func (us *UserService) LeavesUsed(u *model.User, leaveTypes []string, periodStart, periodEnd *time.Time) int {
 	var used int
 
 	// gives ?,?,? for IN (?, ?, ?) if leaveTypes = []string{"vacation", "dayoff", "sick"}
@@ -137,7 +137,7 @@ func (us *UserService) LeavesUsed(u *leavingstone.User, leaveTypes []string, per
 	}
 
 	for rows.Next() {
-		l := leavingstone.Leave{}
+		l := model.Leave{}
 		err := rows.Scan(
 			&l.ID,
 			&l.Start,

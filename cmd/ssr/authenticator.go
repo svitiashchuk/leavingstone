@@ -1,8 +1,8 @@
 package main
 
 import (
-	"leavingstone"
-	"leavingstone/sqlite"
+	"leavingstone/internal/model"
+	"leavingstone/internal/sqlite"
 	"net/http"
 )
 
@@ -12,7 +12,7 @@ type Authenticator struct {
 	us *sqlite.UserService
 }
 
-func (auth *Authenticator) authenticate(r *http.Request) *leavingstone.User {
+func (auth *Authenticator) authenticate(r *http.Request) *model.User {
 	for _, c := range r.Cookies() {
 		if c.Name == AuthCookie {
 			token := c.Value
