@@ -16,7 +16,7 @@ type Keeper struct {
 	sessions map[string]*Session
 }
 
-func NewKeeper() Manager {
+func NewKeeper() *Keeper {
 	return &Keeper{
 		sessions: make(map[string]*Session),
 	}

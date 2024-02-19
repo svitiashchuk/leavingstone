@@ -41,9 +41,10 @@ func (auth *Authenticator) Authenticate(next http.HandlerFunc) http.HandlerFunc 
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		var u *model.User
+		var err error
 		for _, c := range r.Cookies() {
 			if c.Name == AuthCookie && c.Value != "" {
-				u, err := auth.us.FindByToken(c.Value)
+				u, err = auth.us.FindByToken(c.Value)
 				if err != nil {
 					panic(err)
 				}

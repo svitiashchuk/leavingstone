@@ -3,6 +3,7 @@ package tracker
 import (
 	"fmt"
 	"leavingstone/internal/auth"
+	"leavingstone/internal/middleware"
 	"leavingstone/internal/model"
 	"leavingstone/internal/session"
 	"leavingstone/internal/sqlite"
@@ -23,7 +24,7 @@ type Navigation struct {
 }
 
 type App struct {
-	sm   session.Manager
+	sm   *session.Keeper
 	auth *auth.Authenticator
 	us   *sqlite.UserService
 	ls   *sqlite.LeaveService
@@ -31,7 +32,7 @@ type App struct {
 	ac   *Accountant
 }
 
-func NewApp(sm session.Manager, auth *auth.Authenticator, us *sqlite.UserService, ls *sqlite.LeaveService, t *Tracker, ac *Accountant) *App {
+func NewApp(sm *session.Keeper, auth *auth.Authenticator, us *sqlite.UserService, ls *sqlite.LeaveService, t *Tracker, ac *Accountant) *App {
 	return &App{
 		sm:   sm,
 		auth: auth,
@@ -102,19 +103,25 @@ func (app *App) RegisterRoutes() {
 	http.HandleFunc("/dist/", app.handleDist)
 
 	// main routes
-	http.HandleFunc("/login", app.handleLogin)
-	http.HandleFunc("/logout", app.handleLogout)
-	http.HandleFunc("/", app.handleIndex)
-	http.HandleFunc("/plan-leave", app.handlePlanLeave)
-	http.HandleFunc("/profile", app.handleProfile)
-	http.HandleFunc("/overview", app.handleOverview)
+	mainMiddleware := middleware.
+		NewChain().
+		Use(app.sm.Provide).
+		Use(app.auth.Authenticate).
+		Use(middleware.RequireAuth)
 
-	http.HandleFunc("/leaves/approve", app.handleLeaveApprove)
-	http.HandleFunc("/leaves/reject", app.handleLeaveReject)
+	http.HandleFunc("/login", app.handleLogin)
+	http.HandleFunc("/logout", mainMiddleware.Then(app.handleLogout))
+	http.HandleFunc("/", mainMiddleware.Then(app.handleIndex))
+	http.HandleFunc("/plan-leave", mainMiddleware.Then(app.handlePlanLeave))
+	http.HandleFunc("/profile", mainMiddleware.Then(app.handleProfile))
+	http.HandleFunc("/overview", mainMiddleware.Then(app.handleOverview))
+
+	http.HandleFunc("/leaves/approve", mainMiddleware.Then(app.handleLeaveApprove))
+	http.HandleFunc("/leaves/reject", mainMiddleware.Then(app.handleLeaveReject))
 
 	// fragments
-	http.HandleFunc("/tracker", app.handleTracker)
-	http.HandleFunc("/fragments/calendar", app.handleCalendar)
+	http.HandleFunc("/tracker", mainMiddleware.Then(app.handleTracker))
+	http.HandleFunc("/fragments/calendar", mainMiddleware.Then(app.handleCalendar))
 }
 
 func (app *App) handleIndex(w http.ResponseWriter, r *http.Request) {
