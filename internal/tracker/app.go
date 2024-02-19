@@ -29,6 +29,7 @@ type App struct {
 	auth        *auth.Authenticator
 	us          *sqlite.UserService
 	ls          *sqlite.LeaveService
+	teamService *sqlite.TeamService
 	t           *Tracker
 	ac          *Accountant
 	errorLogger *slog.Logger
@@ -125,10 +126,11 @@ func (app *App) RegisterRoutes() {
 	http.HandleFunc("/login", app.handleLogin)
 	http.HandleFunc("/logout", mainMiddleware.Then(app.handleLogout))
 	http.HandleFunc("/", mainMiddleware.Then(app.handleIndex))
-	http.HandleFunc("/plan-leave", mainMiddleware.Then(app.handlePlanLeave))
 	http.HandleFunc("/profile", mainMiddleware.Then(app.handleProfile))
 	http.HandleFunc("/overview", mainMiddleware.Then(app.handleOverview))
+	http.HandleFunc("/teams/create", mainMiddleware.Then(app.CreateTeam))
 
+	http.HandleFunc("/leaves/plan", mainMiddleware.Then(app.handlePlanLeave))
 	http.HandleFunc("/leaves/approve", mainMiddleware.Then(app.handleLeaveApprove))
 	http.HandleFunc("/leaves/reject", mainMiddleware.Then(app.handleLeaveReject))
 
