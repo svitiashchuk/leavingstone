@@ -2,6 +2,8 @@ package auth
 
 import (
 	"context"
+	"leavingstone/internal/handler"
+	"leavingstone/internal/header"
 	"leavingstone/internal/model"
 	"leavingstone/internal/sqlite"
 	"net/http"
@@ -64,6 +66,10 @@ func (auth *Authenticator) Authenticate(next http.HandlerFunc) http.HandlerFunc 
 			return
 		}
 
-		next(w, r)
+		if header.IsHTMX(r) {
+			handler.HTMXRedirect(w, r, "/login")
+		} else {
+			http.Redirect(w, r, "/login", http.StatusFound)
+		}
 	}
 }

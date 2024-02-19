@@ -120,8 +120,7 @@ func (app *App) RegisterRoutes() {
 	mainMiddleware := middleware.
 		NewChain().
 		Use(app.sm.Provide).
-		Use(app.auth.Authenticate).
-		Use(middleware.RequireAuth)
+		Use(app.auth.Authenticate)
 
 	http.HandleFunc("/login", app.handleLogin)
 	http.HandleFunc("/logout", mainMiddleware.Then(app.handleLogout))
