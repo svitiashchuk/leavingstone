@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"leavingstone/internal/auth"
+	"leavingstone/internal/session"
 	"leavingstone/internal/sqlite"
 	"leavingstone/internal/tracker"
 	"net/http"
@@ -19,23 +21,12 @@ func main() {
 	}
 
 	ac := tracker.NewAccountant(us)
-
-	auth := &Authenticator{
-		us: us,
-	}
-
+	auth := auth.New(us)
 	t := tracker.NewTracker(us, ls)
 
-	app := &App{
-		sm:   NewSessionKeeper(),
-		auth: auth,
-		us:   us,
-		ls:   ls,
-		t:    t,
-		ac:   ac,
-	}
+	app := tracker.NewApp(session.NewKeeper(), auth, us, ls, t, ac)
 
-	app.registerRoutes()
+	app.RegisterRoutes()
 
 	addr := ":8080"
 	fmt.Printf("Serving... at %s\n", addr)

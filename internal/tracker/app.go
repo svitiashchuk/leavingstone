@@ -1,10 +1,12 @@
-package main
+package tracker
 
 import (
 	"fmt"
+	"leavingstone/internal/auth"
 	"leavingstone/internal/model"
+	"leavingstone/internal/session"
 	"leavingstone/internal/sqlite"
-	"leavingstone/internal/tracker"
+	"leavingstone/internal/templ"
 	"net/http"
 	"os"
 	"strconv"
@@ -21,12 +23,27 @@ type Navigation struct {
 }
 
 type App struct {
-	sm   SessionManager
-	auth *Authenticator
+	sm   session.Manager
+	auth *auth.Authenticator
 	us   *sqlite.UserService
 	ls   *sqlite.LeaveService
-	t    *tracker.Tracker
-	ac   *tracker.Accountant
+	t    *Tracker
+	ac   *Accountant
+}
+
+func NewApp(sm session.Manager, auth *auth.Authenticator, us *sqlite.UserService, ls *sqlite.LeaveService, t *Tracker, ac *Accountant) *App {
+	return &App{
+		sm:   sm,
+		auth: auth,
+		us:   us,
+		ls:   ls,
+		t:    t,
+		ac:   ac,
+	}
+}
+
+func (app *App) userID(r *http.Request) int {
+	return r.Context().Value(auth.UserIDContextKey).(int)
 }
 
 type CommonTemplateData struct {
@@ -53,10 +70,10 @@ type ProfileTemplateData struct {
 type TrackerTemplateData struct {
 	CommonTemplateData
 	Nav           Navigation
-	Employees     []*tracker.Employee
+	Employees     []*Employee
 	Days          []time.Time
-	WorkforceStat *tracker.WorkforceStat
-	LeavesStat    *tracker.LeavesStat
+	WorkforceStat *WorkforceStat
+	LeavesStat    *LeavesStat
 }
 
 type CalendarTemplateData struct {
@@ -79,23 +96,25 @@ type CalendarNav struct {
 	Next MonthPeriod
 }
 
-func (app *App) registerRoutes() {
-	http.HandleFunc("/login", app.handleLogin)
-	http.HandleFunc("/logout", app.handleLogout)
-	http.HandleFunc("/", app.authenticate(app.requireAuth(app.handleIndex)))
-	http.HandleFunc("/plan-leave", app.session(app.authenticate(app.requireAuth(app.handlePlanLeave))))
-	http.HandleFunc("/profile", app.authenticate(app.requireAuth(app.handleProfile)))
-	http.HandleFunc("/overview", app.session(app.authenticate(app.requireAuth(app.handleOverview))))
+func (app *App) RegisterRoutes() {
 
 	// assets for frontend
 	http.HandleFunc("/dist/", app.handleDist)
 
-	http.HandleFunc("/leaves/approve", app.authenticate(app.requireAuth(app.handleLeaveApprove)))
-	http.HandleFunc("/leaves/reject", app.authenticate(app.requireAuth(app.handleLeaveReject)))
+	// main routes
+	http.HandleFunc("/login", app.handleLogin)
+	http.HandleFunc("/logout", app.handleLogout)
+	http.HandleFunc("/", app.handleIndex)
+	http.HandleFunc("/plan-leave", app.handlePlanLeave)
+	http.HandleFunc("/profile", app.handleProfile)
+	http.HandleFunc("/overview", app.handleOverview)
+
+	http.HandleFunc("/leaves/approve", app.handleLeaveApprove)
+	http.HandleFunc("/leaves/reject", app.handleLeaveReject)
 
 	// fragments
-	http.HandleFunc("/tracker", app.authenticate(app.requireAuth(app.handleTracker)))
-	http.HandleFunc("/fragments/calendar", app.authenticate(app.requireAuth(app.handleCalendar)))
+	http.HandleFunc("/tracker", app.handleTracker)
+	http.HandleFunc("/fragments/calendar", app.handleCalendar)
 }
 
 func (app *App) handleIndex(w http.ResponseWriter, r *http.Request) {
@@ -146,7 +165,7 @@ func (app *App) handleProfile(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
 		template.
 			New("profile").
-			Funcs(templateFuncs()).
+			Funcs(templ.Funcs()).
 			ParseFiles(
 				"frontend/src/templates/layout.html",
 				"frontend/src/templates/profile.html",
@@ -207,7 +226,7 @@ func (app *App) handlePlanLeave(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 
-		app.sm.Get(r.Context().Value(sessionContextKey).(string)).Flash("Leave planned!")
+		app.sm.Get(r.Context().Value(session.SessionContextKey).(string)).Flash("Leave planned!")
 		http.Redirect(w, r, "/overview", http.StatusFound)
 	} else {
 		// Render the form for planning leave
@@ -225,7 +244,7 @@ func (app *App) handlePlanLeave(w http.ResponseWriter, r *http.Request) {
 				Errors: []string{},
 			},
 			CommonTemplateData: *app.commonTemplateData(r),
-			LeaveTypes:         tracker.LeaveTypes(),
+			LeaveTypes:         LeaveTypes(),
 		}
 
 		tmpl.ExecuteTemplate(w, "layout", data)
@@ -236,7 +255,7 @@ func (app *App) handleOverview(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
 		template.
 			New("overview").
-			Funcs(templateFuncs()).
+			Funcs(templ.Funcs()).
 			ParseFiles(
 				"frontend/src/templates/layout.html",
 				"frontend/src/templates/overview.html",
@@ -346,7 +365,7 @@ func (app *App) handleCalendar(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
 		template.
 			New("calendar").
-			Funcs(templateFuncs()).
+			Funcs(templ.Funcs()).
 			ParseFiles(
 				"frontend/src/templates/fragments/calendar.html",
 			),
@@ -388,14 +407,10 @@ func (app *App) handleCalendar(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *App) htmxRedirect(w http.ResponseWriter, r *http.Request, url string) {
-	w.Header().Add("HX-Redirect", url)
-}
-
 func (app *App) commonTemplateData(r *http.Request) *CommonTemplateData {
 	var alert string
 
-	ctxVal := r.Context().Value(sessionContextKey)
+	ctxVal := r.Context().Value(session.SessionContextKey)
 	if ctxVal != nil {
 		session := app.sm.Get(ctxVal.(string))
 		if session != nil {
@@ -404,7 +419,7 @@ func (app *App) commonTemplateData(r *http.Request) *CommonTemplateData {
 	}
 
 	return &CommonTemplateData{
-		IsAuthenticated: app.isAuthenticated(r),
+		IsAuthenticated: true,
 		Alert:           alert,
 	}
 }

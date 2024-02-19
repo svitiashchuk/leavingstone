@@ -1,4 +1,4 @@
-package main
+package templ
 
 import (
 	"html/template"
@@ -9,7 +9,7 @@ import (
 	"unicode"
 )
 
-func templateFuncs() template.FuncMap {
+func Funcs() template.FuncMap {
 	return template.FuncMap{
 		"humanDate": func(t time.Time) string {
 			return t.Format("02 Jan")
