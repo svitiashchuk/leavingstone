@@ -8,6 +8,7 @@ import (
 	"leavingstone/internal/session"
 	"leavingstone/internal/sqlite"
 	"leavingstone/internal/templ"
+	"log/slog"
 	"net/http"
 	"os"
 	"strconv"
@@ -24,22 +25,35 @@ type Navigation struct {
 }
 
 type App struct {
-	sm   *session.Keeper
-	auth *auth.Authenticator
-	us   *sqlite.UserService
-	ls   *sqlite.LeaveService
-	t    *Tracker
-	ac   *Accountant
+	sm          *session.Keeper
+	auth        *auth.Authenticator
+	us          *sqlite.UserService
+	ls          *sqlite.LeaveService
+	t           *Tracker
+	ac          *Accountant
+	errorLogger *slog.Logger
+	appLogger   *slog.Logger
 }
 
-func NewApp(sm *session.Keeper, auth *auth.Authenticator, us *sqlite.UserService, ls *sqlite.LeaveService, t *Tracker, ac *Accountant) *App {
+func NewApp(
+	sm *session.Keeper,
+	auth *auth.Authenticator,
+	us *sqlite.UserService,
+	ls *sqlite.LeaveService,
+	t *Tracker,
+	ac *Accountant,
+	appLogger *slog.Logger,
+	errorLogger *slog.Logger,
+) *App {
 	return &App{
-		sm:   sm,
-		auth: auth,
-		us:   us,
-		ls:   ls,
-		t:    t,
-		ac:   ac,
+		sm:          sm,
+		auth:        auth,
+		us:          us,
+		ls:          ls,
+		t:           t,
+		ac:          ac,
+		appLogger:   appLogger,
+		errorLogger: errorLogger,
 	}
 }
 
@@ -146,12 +160,14 @@ func (app *App) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 		u, err := app.us.Find(email)
 		if err != nil {
-			panic(err)
+			app.internalError(w, err)
+			return
 		}
 
 		err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(passPlain))
 		if err != nil {
-			panic(err)
+			app.internalError(w, err)
+			return
 		}
 
 		c := fmt.Sprintf("auth_token=%s; Path=/; HttpOnly", u.Token)
@@ -181,12 +197,14 @@ func (app *App) handleProfile(w http.ResponseWriter, r *http.Request) {
 
 	u, err := app.us.FindByID(app.userID(r))
 	if err != nil {
-		panic(err)
+		app.internalError(w, err)
+		return
 	}
 
 	leaves, err := app.ls.Upcoming(app.userID(r))
 	if err != nil {
-		panic(err)
+		app.internalError(w, err)
+		return
 	}
 
 	templateData := &ProfileTemplateData{
@@ -201,9 +219,9 @@ func (app *App) handleProfile(w http.ResponseWriter, r *http.Request) {
 		SickdaysUsed:       app.ac.SickdaysUsed(u),
 	}
 
-	err = tmpl.ExecuteTemplate(w, "layout", templateData)
-	if err != nil {
-		panic(err)
+	if err := tmpl.ExecuteTemplate(w, "layout", templateData); err != nil {
+		app.internalError(w, err)
+		return
 	}
 }
 
@@ -217,20 +235,23 @@ func (app *App) handlePlanLeave(w http.ResponseWriter, r *http.Request) {
 		// normalize dates so leave continues from 00:00 to 23:59
 		start, err := time.Parse("2006-01-02", startDate)
 		if err != nil {
-			panic(err)
+			app.clientError(w, err)
+			return
 		}
 		start = time.Date(start.Year(), start.Month(), start.Day(), 0, 0, 0, 0, start.Location())
 
 		end, err := time.Parse("2006-01-02", endDate)
 		if err != nil {
-			panic(err)
+			app.clientError(w, err)
+			return
 		}
 
 		end = time.Date(end.Year(), end.Month(), end.Day(), 23, 59, 59, 0, end.Location())
 
 		err = app.ls.Create(app.userID(r), start, end, leaveType)
 		if err != nil {
-			panic(err)
+			app.internalError(w, err)
+			return
 		}
 
 		app.sm.Get(r.Context().Value(session.SessionContextKey).(string)).Flash("Leave planned!")
@@ -271,7 +292,8 @@ func (app *App) handleOverview(w http.ResponseWriter, r *http.Request) {
 
 	ll, err := app.ls.AllUpcoming()
 	if err != nil {
-		panic(err)
+		app.internalError(w, err)
+		return
 	}
 
 	data := &OverviewTemplateData{
@@ -281,7 +303,8 @@ func (app *App) handleOverview(w http.ResponseWriter, r *http.Request) {
 
 	err = tmpl.ExecuteTemplate(w, "layout", data)
 	if err != nil {
-		panic(err)
+		app.internalError(w, err)
+		return
 	}
 }
 
@@ -328,7 +351,8 @@ func (app *App) handleDist(w http.ResponseWriter, r *http.Request) {
 	// TODO use embed:
 	b, err := os.ReadFile("frontend/dist/output.css")
 	if err != nil {
-		panic(err)
+		app.internalError(w, err)
+		return
 	}
 
 	w.Header().Add("Content-type", "text/css")
@@ -338,12 +362,14 @@ func (app *App) handleDist(w http.ResponseWriter, r *http.Request) {
 func (app *App) handleLeaveApprove(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
-		panic(err)
+		app.internalError(w, err)
+		return
 	}
 
 	id, err := strconv.Atoi(r.Form.Get("id"))
 	if err != nil {
-		panic(err)
+		app.internalError(w, err)
+		return
 	}
 
 	app.t.ApproveLeave(id)
@@ -355,12 +381,14 @@ func (app *App) handleLeaveApprove(w http.ResponseWriter, r *http.Request) {
 func (app *App) handleLeaveReject(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
-		panic(err)
+		app.clientError(w, err)
+		return
 	}
 
 	id, err := strconv.Atoi(r.Form.Get("id"))
 	if err != nil {
-		panic(err)
+		app.clientError(w, err)
+		return
 	}
 
 	app.t.RejectLeave(id)
@@ -410,7 +438,8 @@ func (app *App) handleCalendar(w http.ResponseWriter, r *http.Request) {
 
 	err = tmpl.ExecuteTemplate(w, "calendar.html", data)
 	if err != nil {
-		panic(err)
+		app.internalError(w, err)
+		return
 	}
 }
 
