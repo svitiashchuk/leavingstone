@@ -52,6 +52,12 @@ func Funcs() template.FuncMap {
 				}
 			}, s)
 		},
+		"firstName": func(s string) string {
+			return strings.Split(s, " ")[0]
+		},
+		"lastName": func(s string) string {
+			return strings.Join(strings.Split(s, " ")[1:], " ")
+		},
 		"monthNum": func(m time.Month) int {
 			return int(m)
 		},

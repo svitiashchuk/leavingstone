@@ -13,13 +13,8 @@ type LeaveService struct {
 }
 
 // TODO pass DB
-func NewLeaveService() (*LeaveService, error) {
-	db, err := sql.Open("sqlite3", DSN)
-	if err != nil {
-		return nil, err
-	}
-
-	return &LeaveService{db}, nil
+func NewLeaveService(db *sql.DB) *LeaveService {
+	return &LeaveService{db}
 }
 
 func (ls *LeaveService) List(from, to time.Time, limit int) ([]*model.Leave, error) {

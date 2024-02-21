@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"leavingstone/internal/auth"
 	"leavingstone/internal/session"
@@ -11,25 +12,26 @@ import (
 	"os"
 )
 
+const DSN = "file:database.db?cache=shared&mode=rwc"
+
 func main() {
 	errLogger := slog.New(slog.NewJSONHandler(os.Stderr, nil))
 	appLogger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
-	us, err := sqlite.NewUserService()
+	db, err := sql.Open("sqlite3", DSN)
 	if err != nil {
-		panic(err)
+		errLogger.Error(err.Error())
+		os.Exit(1)
 	}
 
-	ls, err := sqlite.NewLeaveService()
-	if err != nil {
-		panic(err)
-	}
-
+	us := sqlite.NewUserService(db)
+	ls := sqlite.NewLeaveService(db)
+	teamService := sqlite.NewTeamService(db)
 	ac := tracker.NewAccountant(us)
 	auth := auth.New(us)
 	t := tracker.NewTracker(us, ls)
 
-	app := tracker.NewApp(session.NewKeeper(), auth, us, ls, t, ac, appLogger, errLogger)
+	app := tracker.NewApp(session.NewKeeper(), auth, us, ls, teamService, t, ac, appLogger, errLogger)
 
 	app.RegisterRoutes()
 

@@ -41,6 +41,7 @@ func NewApp(
 	auth *auth.Authenticator,
 	us *sqlite.UserService,
 	ls *sqlite.LeaveService,
+	teamService *sqlite.TeamService,
 	t *Tracker,
 	ac *Accountant,
 	appLogger *slog.Logger,
@@ -51,6 +52,7 @@ func NewApp(
 		auth:        auth,
 		us:          us,
 		ls:          ls,
+		teamService: teamService,
 		t:           t,
 		ac:          ac,
 		appLogger:   appLogger,
@@ -129,6 +131,7 @@ func (app *App) RegisterRoutes() {
 	http.HandleFunc("/profile", mainMiddleware.Then(app.handleProfile))
 	http.HandleFunc("/overview", mainMiddleware.Then(app.handleOverview))
 	http.HandleFunc("/teams/create", mainMiddleware.Then(app.CreateTeam))
+	http.HandleFunc("/teams/details", mainMiddleware.Then(app.TeamDetails))
 
 	http.HandleFunc("/leaves/plan", mainMiddleware.Then(app.handlePlanLeave))
 	http.HandleFunc("/leaves/approve", mainMiddleware.Then(app.handleLeaveApprove))

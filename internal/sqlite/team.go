@@ -40,7 +40,7 @@ func (s *TeamService) AllTeams() ([]*model.Team, error) {
 	return teams, nil
 }
 
-func (s *TeamService) FindTeamByID(id int) (*model.Team, error) {
+func (s *TeamService) FindByID(id int) (*model.Team, error) {
 	query := "SELECT id, name FROM teams WHERE id = ?"
 	row := s.db.QueryRow(query, id)
 

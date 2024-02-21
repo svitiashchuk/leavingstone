@@ -10,19 +10,12 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-const DSN = "file:database.db?cache=shared&mode=rwc"
-
 type UserService struct {
 	db *sql.DB
 }
 
-func NewUserService() (*UserService, error) {
-	db, err := sql.Open("sqlite3", DSN)
-	if err != nil {
-		return nil, err
-	}
-
-	return &UserService{db}, nil
+func NewUserService(db *sql.DB) *UserService {
+	return &UserService{db}
 }
 
 func (us *UserService) FindByID(id int) (*model.User, error) {
@@ -35,6 +28,27 @@ func (us *UserService) FindByID(id int) (*model.User, error) {
 	}
 
 	return user, nil
+}
+
+func (us *UserService) FindByTeamID(teamID int) ([]*model.User, error) {
+	rows, err := us.db.Query("SELECT id, name, email, token, password, start FROM users WHERE team_id = ?", teamID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	users := []*model.User{}
+	for rows.Next() {
+		user := &model.User{}
+		err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.Token, &user.Password, &user.Started)
+		if err != nil {
+			return nil, err
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
 }
 
 func (us *UserService) Find(email string) (*model.User, error) {
