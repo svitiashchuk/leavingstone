@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"leavingstone/internal/sqlite"
@@ -8,17 +9,16 @@ import (
 	"net/http"
 )
 
+const DSN = "file:database.db?cache=shared&mode=rwc"
+
 func main() {
-	us, err := sqlite.NewUserService()
+	db, err := sql.Open("sqlite3", DSN)
 	if err != nil {
 		panic(err)
 	}
 
-	ls, err := sqlite.NewLeaveService()
-	if err != nil {
-		panic(err)
-	}
-
+	us := sqlite.NewUserService(db)
+	ls := sqlite.NewLeaveService(db)
 	t := tracker.NewTracker(us, ls)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
