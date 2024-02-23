@@ -1,40 +1,43 @@
 {{define "title"}}Team details{{end}}
 
 {{define "main"}}
-<div class="grid grid-cols-4 gap-4 not-prose p-8">
-    <div class="col-span-1">
-        <div class="card h-full bg-base-100 shadow-xl">
-            <figure>
-                <div class="flex items-center space-x-4">
-                    <div class="relative inline-flex items-center justify-center m-3 w-16 h-16 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600 ring-2 ring-secondary">
-                        <span class="text-xl text-gray-600 dark:text-gray-300">{{ .Team.Name | nameAbbrev }}</span>
+<main class="flex-1 overflow-y-auto md:pt-4 pt-4 px-6 bg-base-200">
+    <div class="grid grid-cols-4 gap-4 not-prose p-8">
+        <div class="col-span-1">
+            <div class="card w-full h-full p-6 bg-base-100 shadow-xl mt-2">
+                <figure>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative inline-flex items-center justify-center m-3 w-16 h-16 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600 ring-2 ring-secondary">
+                            <span class="text-xl text-gray-600 dark:text-gray-300">{{ .Team.Name | nameAbbrev }}</span>
+                        </div>
+                        <div class="text-xl dark:text-white">
+                            <div>{{ .Team.Name }}</div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">Founded on 21 Feb 2024</div>
+                        </div>
                     </div>
-                    <div class="text-xl dark:text-white">
-                        <div>{{ .Team.Name }}</div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Founded on 21 Feb 2024</div>
-                    </div>
-                </div>
-            </figure>
-            <div class="card-body">
-                <h2 class="card-title dark:text-white">
-                    Team's Data
-                </h2>
-                <div class="card-actions">
-                    <div class="w-full">
-                        <p>Members: {{ len .Members }}</p>
-                    </div>
-
-                    <div class="w-full">
-                        <p>Collective Wellbeing: {{ .WellbeingState }}</p>
-                        <div class="radial-progress text-primary" style="--value: {{ .WellbeingIndex }};" role="progressbar">{{ .WellbeingIndex }}%</div>
+                </figure>
+                <div class="divider"></div>
+                <div class="card-body">
+                    <h2 class="card-title dark:text-white">
+                        Team's Data
+                    </h2>
+                    <div class="card-actions">
+                        <div class="w-full">
+                            <p>Members: {{ len .Members }}</p>
+                        </div>
+                        <div class="w-full">
+                            <div class="inline-block">
+                                <div>Wellbeing:</div>
+                                <div>{{ .WellbeingState }}</div>
+                            </div>
+                            <div class="float-right radial-progress text-primary" style="--value: {{ .WellbeingIndex }};" role="progressbar">{{ .WellbeingIndex }}%</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="col-span-3">
-        <main class="flex-1 overflow-y-auto md:pt-4 pt-4 px-6 bg-base-200">
-            <div class="card w-full p-6 bg-base-100 shadow-xl mt-2">
+        <div class="col-span-3">
+            <div class="card w-full h-full p-6 bg-base-100 shadow-xl mt-2">
                 <div class="text-xl font-semibold inline-block">Team Members<div class="inline-block float-right">
                         <div class="inline-block float-right"><button class="btn px-6 btn-sm normal-case btn-primary">Add New</button></div>
                     </div>
@@ -88,20 +91,21 @@
                     </div>
                 </div>
             </div>
-        </main>
-    </div>
-    <dialog id="removal_modal" class="modal">
-        <div class="modal-box">
-            <form method="dialog">
-                <button class="btn btn-sm btn-circle absolute right-2 top-2">✕</button>
-            </form>
-            <h3 class="font-semibold text-2xl pb-6 text-center">Confirmation</h3>
-            <p class=" text-xl mt-8 text-center">Are you sure you want to remove this member from the team?</p>
-            <div class="modal-action mt-12">
-                <button class="btn btn-outline">Cancel</button>
-                <button class="btn btn-primary w-36">Yes</button>
-            </div>
         </div>
-    </dialog>
-</div>
+    </div>
+</main>
+<dialog id="removal_modal" class="modal">
+    <div class="modal-box">
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle absolute right-2 top-2">✕</button>
+        </form>
+        <h3 class="font-semibold text-2xl pb-6 text-center">Confirmation</h3>
+        <p class=" text-xl mt-8 text-center">Are you sure you want to remove this member from the team?</p>
+        <div class="modal-action mt-12">
+            <button class="btn btn-outline">Cancel</button>
+            <button class="btn btn-primary w-36">Yes</button>
+        </div>
+    </div>
+</dialog>
+
 {{ end }}
