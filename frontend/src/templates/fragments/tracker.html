@@ -9,6 +9,14 @@
             <a class="join-item btn" aria-label="Next" hx-trigger="click" hx-target="#tracker-container"
                 hx-swap="innerHTML" hx-get="/tracker?year={{ .Nav.Next.Year }}&month={{ .Nav.Next.MonthNum }}">»</a>
         </div>
+        <div class="mt-4">
+            <div class="badge">Working</div>
+            <div class="badge badge-neutral">Weekend</div>
+            <div class="badge badge-secondary">Bank Holiday</div>
+            <div class="badge badge-primary">Day off</div>
+            <div class="badge badge-accent">Vacation</div>
+            <div class="badge badge-warning">Sick Day</div>
+        </div>
     </div>
 
     <div class="stats shadow bg-base-200">
@@ -39,8 +47,8 @@
 </div>
 
 <!-- End pagination block -->
-<div class="overflow-x-scroll min-h-screen">
-    <table class="table-auto table-xs table-pin-cols h-full">
+<div class="overflow-x-scroll">
+    <table class="table-auto table-xs table-pin-cols mb-8">
         <thead>
             <th>Employee</th>
             {{ range .Days }}

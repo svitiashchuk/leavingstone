@@ -4030,6 +4030,11 @@ html {
   margin-right: auto;
 }
 
+.mx-0 {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
 .mb-3 {
   margin-bottom: 0.75rem;
 }
@@ -4110,6 +4115,10 @@ html {
 
 .mt-auto {
   margin-top: auto;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
 }
 
 .block {
@@ -4244,6 +4253,10 @@ html {
   width: 100%;
 }
 
+.w-screen {
+  width: 100vw;
+}
+
 .min-w-0 {
   min-width: 0px;
 }
@@ -4261,12 +4274,24 @@ html {
   max-width: 24rem;
 }
 
+.max-w-full {
+  max-width: 100%;
+}
+
 .flex-1 {
   flex: 1 1 0%;
 }
 
 .flex-auto {
   flex: 1 1 auto;
+}
+
+.flex-none {
+  flex: none;
+}
+
+.flex-initial {
+  flex: 0 1 auto;
 }
 
 .flex-shrink-0 {
@@ -4278,6 +4303,10 @@ html {
 }
 
 .flex-grow {
+  flex-grow: 1;
+}
+
+.grow {
   flex-grow: 1;
 }
 
@@ -4395,12 +4424,20 @@ html {
   overflow: hidden;
 }
 
+.overflow-scroll {
+  overflow: scroll;
+}
+
 .overflow-x-auto {
   overflow-x: auto;
 }
 
 .overflow-y-auto {
   overflow-y: auto;
+}
+
+.overflow-x-hidden {
+  overflow-x: hidden;
 }
 
 .overflow-x-scroll {

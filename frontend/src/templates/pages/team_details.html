@@ -1,4 +1,4 @@
-{{define "title"}}Home{{end}}
+{{define "title"}}Team details{{end}}
 
 {{define "main"}}
 <div class="grid grid-cols-4 gap-4 not-prose p-8">
@@ -69,7 +69,9 @@
                                         </div>
                                     </td>
                                     <td>{{ .Started | humanDate }}</td>
-                                    <td>{{ .TodayStatus | availabilityBadge }} </td>
+                                    <td>
+                                        {{ .TodayStatus | availabilityBadge }}
+                                    </td>
                                     <td>{{ .VacationsUsed }}</td>
                                     <td>{{ .SickdaysUsed }}</td>
                                     <td>

@@ -116,7 +116,7 @@ func Funcs() template.FuncMap {
 		"monthNum": func(m time.Month) int {
 			return int(m)
 		},
-		"availabilityBadge": func(leaveType string) string {
+		"availabilityBadge": func(leaveType string) template.HTML {
 			if leaveType == "vacation" {
 				return `<div class="badge badge-accent">Vacation</div>`
 			}

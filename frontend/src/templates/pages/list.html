@@ -1,15 +1,15 @@
 {{define "title"}}Home{{end}}
 
 {{define "main"}}
-<div>
-    <div class="badge">Working</div>
-    <div class="badge badge-neutral">Weekend</div>
-    <div class="badge badge-secondary">Bank Holiday</div>
-    <div class="badge badge-primary">Day off</div>
-    <div class="badge badge-accent">Vacation</div>
-    <div class="badge badge-warning">Sick Day</div>
-</div>
+<main class="flex-1 overflow-y-auto bg-base-200 w-full">
+    <div class="grid grid-cols-1 p-8">
+        <div class="card w-full p-6 bg-base-100 shadow-xl mt-2">
+            <div class="text-xl font-semibold inline-block">Tracker</div>
+            <div class="divider mt-2"></div>
+            <div id="tracker-container" hx-get="/tracker" hx-trigger="revealed" hx-swap="innerHTML"></div>
+        </div>
+    </div>
 
-<div id="tracker-container" hx-get="/tracker" hx-trigger="revealed" hx-swap="innerHTML">
-</div>
+
+</main>
 {{ end }}
