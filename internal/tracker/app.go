@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"text/template"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -32,6 +31,7 @@ type App struct {
 	teamService *sqlite.TeamService
 	t           *Tracker
 	ac          *Accountant
+	templator   *templ.Templator
 	errorLogger *slog.Logger
 	appLogger   *slog.Logger
 }
@@ -44,6 +44,7 @@ func NewApp(
 	teamService *sqlite.TeamService,
 	t *Tracker,
 	ac *Accountant,
+	templator *templ.Templator,
 	appLogger *slog.Logger,
 	errorLogger *slog.Logger,
 ) *App {
@@ -55,6 +56,7 @@ func NewApp(
 		teamService: teamService,
 		t:           t,
 		ac:          ac,
+		templator:   templator,
 		appLogger:   appLogger,
 		errorLogger: errorLogger,
 	}
@@ -145,20 +147,13 @@ func (app *App) RegisterRoutes() {
 }
 
 func (app *App) handleIndex(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles(
-		"frontend/src/templates/layout.html",
-		"frontend/src/templates/list.html",
-	))
-
-	tmpl.ExecuteTemplate(w, "layout", app.commonTemplateData(r))
+	if err := app.templator.Page("list", nil).ExecuteTemplate(w, "layout", app.commonTemplateData(r)); err != nil {
+		app.internalError(w, err)
+		return
+	}
 }
 
 func (app *App) handleLogin(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles(
-		"frontend/src/templates/layout.html",
-		"frontend/src/templates/login.html",
-	))
-
 	if r.Method == "POST" {
 		r.ParseForm()
 		email := r.Form.Get("email")
@@ -180,9 +175,14 @@ func (app *App) handleLogin(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Set-Cookie", c)
 
 		http.Redirect(w, r, "/overview", http.StatusFound)
+		return
 	}
 
-	tmpl.ExecuteTemplate(w, "layout", app.commonTemplateData(r))
+	tmpl := app.templator.Page("login", nil)
+	if err := tmpl.ExecuteTemplate(w, "layout", app.commonTemplateData(r)); err != nil {
+		app.internalError(w, err)
+		return
+	}
 }
 
 func (app *App) handleLogout(w http.ResponseWriter, r *http.Request) {
@@ -191,16 +191,6 @@ func (app *App) handleLogout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) handleProfile(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(
-		template.
-			New("profile").
-			Funcs(templ.Funcs()).
-			ParseFiles(
-				"frontend/src/templates/layout.html",
-				"frontend/src/templates/profile.html",
-			),
-	)
-
 	u, err := app.us.FindByID(app.userID(r))
 	if err != nil {
 		app.internalError(w, err)
@@ -225,6 +215,7 @@ func (app *App) handleProfile(w http.ResponseWriter, r *http.Request) {
 		SickdaysUsed:       app.ac.SickdaysUsed(u),
 	}
 
+	tmpl := app.templator.Page("profile", templ.Funcs())
 	if err := tmpl.ExecuteTemplate(w, "layout", templateData); err != nil {
 		app.internalError(w, err)
 		return
@@ -262,13 +253,9 @@ func (app *App) handlePlanLeave(w http.ResponseWriter, r *http.Request) {
 
 		app.sm.Get(r.Context().Value(session.SessionContextKey).(string)).Flash("Leave planned!")
 		http.Redirect(w, r, "/overview", http.StatusFound)
+		return
 	} else {
 		// Render the form for planning leave
-		tmpl := template.Must(template.ParseFiles(
-			"frontend/src/templates/layout.html",
-			"frontend/src/templates/plan_leave.html",
-		))
-
 		data := struct {
 			CommonFormTemplateData
 			CommonTemplateData
@@ -281,21 +268,15 @@ func (app *App) handlePlanLeave(w http.ResponseWriter, r *http.Request) {
 			LeaveTypes:         LeaveTypes(),
 		}
 
-		tmpl.ExecuteTemplate(w, "layout", data)
+		tmpl := app.templator.Page("plan_leave", templ.Funcs())
+		if err := tmpl.ExecuteTemplate(w, "layout", data); err != nil {
+			app.internalError(w, err)
+			return
+		}
 	}
 }
 
 func (app *App) handleOverview(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(
-		template.
-			New("overview").
-			Funcs(templ.Funcs()).
-			ParseFiles(
-				"frontend/src/templates/layout.html",
-				"frontend/src/templates/overview.html",
-			),
-	)
-
 	ll, err := app.ls.AllUpcoming()
 	if err != nil {
 		app.internalError(w, err)
@@ -307,18 +288,14 @@ func (app *App) handleOverview(w http.ResponseWriter, r *http.Request) {
 		UpcomingLeaves:     ll,
 	}
 
-	err = tmpl.ExecuteTemplate(w, "layout", data)
-	if err != nil {
+	tmpl := app.templator.Page("overview", templ.Funcs())
+	if err := tmpl.ExecuteTemplate(w, "layout", data); err != nil {
 		app.internalError(w, err)
 		return
 	}
 }
 
 func (app *App) handleTracker(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles(
-		"frontend/src/templates/fragments/tracker.html",
-	))
-
 	y, err := strconv.Atoi(r.URL.Query().Get("year"))
 	if err != nil {
 		y = time.Now().Year()
@@ -350,7 +327,11 @@ func (app *App) handleTracker(w http.ResponseWriter, r *http.Request) {
 		LeavesStat:         app.t.LeavesStat(days, ee),
 	}
 
-	tmpl.ExecuteTemplate(w, "tracker.html", data)
+	tmpl := app.templator.Fragment("tracker", nil)
+	if err := tmpl.ExecuteTemplate(w, "tracker.html", data); err != nil {
+		app.internalError(w, err)
+		return
+	}
 }
 
 func (app *App) handleDist(w http.ResponseWriter, r *http.Request) {
@@ -408,15 +389,6 @@ func (app *App) handleLeaveReject(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) handleCalendar(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(
-		template.
-			New("calendar").
-			Funcs(templ.Funcs()).
-			ParseFiles(
-				"frontend/src/templates/fragments/calendar.html",
-			),
-	)
-
 	monthNum, err := strconv.Atoi(r.URL.Query().Get("month"))
 	if err != nil {
 		monthNum = int(time.Now().Month())
@@ -447,8 +419,8 @@ func (app *App) handleCalendar(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	err = tmpl.ExecuteTemplate(w, "calendar.html", data)
-	if err != nil {
+	tmpl := app.templator.Fragment("calendar", templ.Funcs())
+	if err := tmpl.ExecuteTemplate(w, "calendar.html", data); err != nil {
 		app.internalError(w, err)
 		return
 	}

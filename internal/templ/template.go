@@ -9,6 +9,59 @@ import (
 	"unicode"
 )
 
+type Templator struct {
+	pagesCache     map[string]*template.Template
+	fragmentsCache map[string]*template.Template
+}
+
+func New() *Templator {
+	return &Templator{
+		pagesCache:     make(map[string]*template.Template),
+		fragmentsCache: make(map[string]*template.Template),
+	}
+}
+
+func (t *Templator) Fragment(name string, tFuncs template.FuncMap) *template.Template {
+	if _, ok := t.fragmentsCache[name]; !ok {
+		filename := "frontend/src/templates/fragments/" + name + ".html"
+
+		tem := template.New(name)
+		if len(tFuncs) > 0 {
+			tem.Funcs(tFuncs)
+		}
+		t.fragmentsCache[name] = template.Must(tem.ParseFiles(filename))
+	}
+
+	return t.fragmentsCache[name]
+}
+
+func (t *Templator) Page(name string, tFuncs template.FuncMap) *template.Template {
+	if _, ok := t.pagesCache[name]; !ok {
+		pageHTMLFilename := "frontend/src/templates/pages/" + name + ".html"
+		files := append(basicTemplates(), pageHTMLFilename)
+
+		tem := template.New(name)
+		if len(tFuncs) > 0 {
+			tem.Funcs(tFuncs)
+		}
+
+		t.pagesCache[name] = template.Must(
+			tem.ParseFiles(files...),
+		)
+	}
+
+	return t.pagesCache[name]
+}
+
+func basicTemplates() []string {
+	return []string{
+		"frontend/src/templates/layout.html",
+		"frontend/src/templates/partials/nav.html",
+		"frontend/src/templates/partials/alert.html",
+		"frontend/src/templates/partials/sidebar.html",
+	}
+}
+
 func Funcs() template.FuncMap {
 	return template.FuncMap{
 		"humanDate": func(t time.Time) string {

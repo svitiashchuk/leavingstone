@@ -1,0 +1,41 @@
+{{ define "nav" }}
+<div class="navbar bg-base-100">
+    <div class="navbar-start">
+        <label class="btn btn-ghost text-xl drawer-button" for="main-drawer">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+        </label>
+        <a class="btn btn-ghost text-xl" href="/">TeamSt.one</a>
+    </div>
+    <div class="navbar-end">
+        {{ if .IsAuthenticated }}
+        <a class="btn" href="/leaves/plan">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+            </svg>
+            Plan a leave
+        </a>
+        <div class="dropdown dropdown-end">
+            <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+                <div class="w-10 rounded-full">
+                    <img alt="Profile picture" src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+                </div>
+            </div>
+            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                <li>
+                    <a class="justify-between" href="/profile">
+                        Profile
+                        <span class="badge badge-warning">1</span>
+                    </a>
+                </li>
+                <li><a href="/settings">Settings</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </div>
+        {{ else }}
+        <a class="btn" href="/login">Login</a>
+        {{ end }}
+    </div>
+</div>
+{{ end }}

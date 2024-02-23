@@ -6,6 +6,7 @@ import (
 	"leavingstone/internal/auth"
 	"leavingstone/internal/session"
 	"leavingstone/internal/sqlite"
+	"leavingstone/internal/templ"
 	"leavingstone/internal/tracker"
 	"log/slog"
 	"net/http"
@@ -31,7 +32,9 @@ func main() {
 	auth := auth.New(us)
 	t := tracker.NewTracker(us, ls)
 
-	app := tracker.NewApp(session.NewKeeper(), auth, us, ls, teamService, t, ac, appLogger, errLogger)
+	templator := templ.New()
+
+	app := tracker.NewApp(session.NewKeeper(), auth, us, ls, teamService, t, ac, templator, appLogger, errLogger)
 
 	app.RegisterRoutes()
 

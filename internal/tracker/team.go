@@ -6,7 +6,6 @@ import (
 	"leavingstone/internal/templ"
 	"net/http"
 	"strconv"
-	"text/template"
 )
 
 type TeamDetailsTemplateData struct {
@@ -44,12 +43,11 @@ func (app *App) CreateTeam(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(template.ParseFiles(
-		"frontend/src/templates/layout.html",
-		"frontend/src/templates/team_create.html",
-	))
-
-	tmpl.ExecuteTemplate(w, "layout", app.commonTemplateData(r))
+	tmpl := app.templator.Page("team_create", nil)
+	if err := tmpl.ExecuteTemplate(w, "layout", app.commonTemplateData(r)); err != nil {
+		app.internalError(w, err)
+		return
+	}
 }
 
 func (app *App) TeamDetails(w http.ResponseWriter, r *http.Request) {
@@ -71,16 +69,7 @@ func (app *App) TeamDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl := template.Must(
-		template.
-			New("team_details").
-			Funcs(templ.Funcs()).
-			ParseFiles(
-				"frontend/src/templates/layout.html",
-				"frontend/src/templates/team_details.html",
-			),
-	)
-
+	tmpl := app.templator.Page("team_details", templ.Funcs())
 	if err := tmpl.ExecuteTemplate(w, "layout", &TeamDetailsTemplateData{
 		Team:               team,
 		Members:            members,
@@ -89,5 +78,6 @@ func (app *App) TeamDetails(w http.ResponseWriter, r *http.Request) {
 		CommonTemplateData: app.commonTemplateData(r),
 	}); err != nil {
 		app.internalError(w, err)
+		return
 	}
 }
