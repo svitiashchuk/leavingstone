@@ -22,7 +22,8 @@ func New() *Templator {
 }
 
 func (t *Templator) Fragment(name string, tFuncs template.FuncMap) *template.Template {
-	if _, ok := t.fragmentsCache[name]; !ok {
+	skipCache := true
+	if _, ok := t.fragmentsCache[name]; !ok || skipCache {
 		filename := "frontend/src/templates/fragments/" + name + ".html"
 
 		tem := template.New(name)
@@ -36,7 +37,8 @@ func (t *Templator) Fragment(name string, tFuncs template.FuncMap) *template.Tem
 }
 
 func (t *Templator) Page(name string, tFuncs template.FuncMap) *template.Template {
-	if _, ok := t.pagesCache[name]; !ok {
+	skipCache := true
+	if _, ok := t.pagesCache[name]; !ok || skipCache {
 		pageHTMLFilename := "frontend/src/templates/pages/" + name + ".html"
 		files := append(basicTemplates(), pageHTMLFilename)
 

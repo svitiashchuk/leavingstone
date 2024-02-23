@@ -14,5 +14,6 @@ func (app *App) handleSettings(w http.ResponseWriter, r *http.Request) {
 		CommonTemplateData: app.commonTemplateData(r),
 	}); err != nil {
 		app.internalError(w, err)
+		return
 	}
 }
