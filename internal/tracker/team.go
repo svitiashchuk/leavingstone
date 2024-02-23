@@ -11,6 +11,7 @@ import (
 
 type TeamDetailsTemplateData struct {
 	Team           *model.Team
+	Members        []*model.MemberInfo
 	WellbeingState string
 	WellbeingIndex int
 	*CommonTemplateData
@@ -64,7 +65,7 @@ func (app *App) TeamDetails(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	team.Members, err = app.us.FindByTeamID(team.ID)
+	members, err := app.us.TeamMembers(teamID)
 	if err != nil {
 		app.internalError(w, err)
 		return
@@ -79,8 +80,10 @@ func (app *App) TeamDetails(w http.ResponseWriter, r *http.Request) {
 				"frontend/src/templates/team_details.html",
 			),
 	)
+
 	if err := tmpl.ExecuteTemplate(w, "layout", &TeamDetailsTemplateData{
 		Team:               team,
+		Members:            members,
 		WellbeingState:     "good",
 		WellbeingIndex:     87,
 		CommonTemplateData: app.commonTemplateData(r),

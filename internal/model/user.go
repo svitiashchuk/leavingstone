@@ -13,6 +13,17 @@ type User struct {
 	ExtraVacation int
 }
 
+type MemberInfo struct {
+	ID            int
+	Name          string
+	Email         string
+	Started       time.Time
+	ExtraVacation int
+	VacationsUsed int
+	SickdaysUsed  int
+	TodayStatus   string
+}
+
 type UserService interface {
 	AllUsers() ([]*User, error)
 	LeavesUsed(u *User, leaveTypes []string, periodStart, periodEnd *time.Time) int

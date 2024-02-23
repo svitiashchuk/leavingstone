@@ -61,5 +61,19 @@ func Funcs() template.FuncMap {
 		"monthNum": func(m time.Month) int {
 			return int(m)
 		},
+		"availabilityBadge": func(leaveType string) string {
+			if leaveType == "vacation" {
+				return `<div class="badge badge-accent">Vacation</div>`
+			}
+			if leaveType == "sick" {
+				return `<div class="badge badge-warning">Sick Leave</div>`
+			}
+			if leaveType == "dayoff" {
+				return `<div class="badge badge-primary">Day Off</div>`
+			}
+
+			// TODO handle weekend / bank holiday
+			return `<div class="badge">Available</div>`
+		},
 	}
 }
