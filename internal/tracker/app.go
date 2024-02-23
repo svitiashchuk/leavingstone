@@ -137,6 +137,8 @@ func (app *App) RegisterRoutes() {
 	http.HandleFunc("/leaves/approve", mainMiddleware.Then(app.handleLeaveApprove))
 	http.HandleFunc("/leaves/reject", mainMiddleware.Then(app.handleLeaveReject))
 
+	http.HandleFunc("/settings", mainMiddleware.Then(app.handleSettings))
+
 	// fragments
 	http.HandleFunc("/tracker", mainMiddleware.Then(app.handleTracker))
 	http.HandleFunc("/fragments/calendar", mainMiddleware.Then(app.handleCalendar))
@@ -352,14 +354,19 @@ func (app *App) handleTracker(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) handleDist(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Path[1:]
 	// TODO use embed:
-	b, err := os.ReadFile("frontend/dist/output.css")
+	b, err := os.ReadFile("frontend/" + path)
 	if err != nil {
 		app.internalError(w, err)
 		return
 	}
 
-	w.Header().Add("Content-type", "text/css")
+	if path[len(path)-4:] == ".svg" {
+		w.Header().Add("Content-type", "image/svg+xml")
+	} else {
+		w.Header().Add("Content-type", "text/css")
+	}
 	w.Write(b)
 }
 
