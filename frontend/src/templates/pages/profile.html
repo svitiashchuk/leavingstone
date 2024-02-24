@@ -1,69 +1,76 @@
 {{define "title"}}Home{{end}}
 
 {{define "main"}}
-<div class="grid grid-cols-3 gap-4 not-prose p-8">
-    <div>
-        <div class="card h-full w-96 bg-base-100 shadow-xl">
-            <figure>
-                <div class="flex items-center space-x-4">
-                    <div
-                        class="relative inline-flex items-center justify-center m-3 w-16 h-16 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600 ring-2 ring-secondary">
-                        <span class="text-xl text-gray-600 dark:text-gray-300">{{ .User.Name | nameAbbrev }}</span>
+<main class="flex-1 overflow-y-auto md:pt-4 pt-4 px-6 bg-base-200">
+    <div class="grid grid-cols-4 gap-4 not-prose p-8">
+        <div class="col-span-1">
+            <div class="card w-full h-full p-6 bg-base-100 shadow-xl mt-2">
+                <figure>
+                    <div class="flex items-center space-x-4">
+                        <div
+                            class="relative inline-flex items-center justify-center m-3 w-16 h-16 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600 ring-2 ring-secondary">
+                            <span class="text-xl text-gray-600 dark:text-gray-300">{{ .User.Name | nameAbbrev }}</span>
+                        </div>
+                        <div class="text-xl dark:text-white">
+                            <div>{{ .User.Name }}</div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">Joined in {{ .User.Started | humanDate }}</div>
+                        </div>
                     </div>
-                    <div class="text-xl dark:text-white">
-                        <div>{{ .User.Name }}</div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Joined in {{ .User.Started | humanDate }}</div>
+                </figure>
+                <div class="card-body">
+                    <h2 class="card-title dark:text-white">
+                        Leaves left
+                    </h2>
+                    <div class="card-actions">
+                        <div class="w-full">
+                            <p>Days off and vacation: {{ .VacationsLeft }}</p>
+                            <progress class="progress progress-primary w-full" value="{{ calculatePercentage .VacationsLeft .VacationsMax }}" max="100"></progress>
+                        </div>
+
+                        <div class="w-full">
+                            <p>Sick days: {{ .SickdaysLeft }}</p>
+                            <progress class="progress progress-warning w-full" value="{{ calculatePercentage .SickdaysLeft .SickdaysMax }}" max="100"></progress>
+                        </div>
                     </div>
                 </div>
-            </figure>
-            <div class="card-body">
-                <h2 class="card-title dark:text-white">
-                    Leaves left
-                </h2>
-                <div class="card-actions">
-                    <div class="w-full">
-                        <p>Days off and vacation: {{ .VacationsLeft }}</p>
-                        <progress class="progress progress-primary w-full" value="{{ calculatePercentage .VacationsLeft .VacationsMax }}" max="100"></progress>
-                    </div>
-
-                    <div class="w-full">
-                        <p>Sick days: {{ .SickdaysLeft }}</p>
-                        <progress class="progress progress-warning w-full" value="{{ calculatePercentage .SickdaysLeft .SickdaysMax }}" max="100"></progress>
+            </div>
+        </div>
+        <div class="col-span-3">
+            <div class="card w-full h-full p-6 bg-base-100 shadow-xl mt-2">
+                <div class="text-xl font-semibold ">My Upcoming Leaves</div>
+                <div class="divider mt-2"></div>
+                <div class="h-full w-full pb-6 bg-base-100">
+                    <div class="overflow-y-auto">
+                        <ul class="steps steps-vertical">
+                            {{ range .UpcomingLeaves }}
+                            <li data-content="{{ . | leaveTypeSign }}" class="step step-{{ . | leaveTypeColor }} grid-cols-1">
+                                <div class="inline-flex items-center ml-4 pl-4">
+                                    <div>
+                                        {{ .Type }} on {{ .Start | humanDate }} - {{ .End | humanDate }} ({{ .DurationDays }} days) 
+                                    </div>
+                                    {{ if .Approved }}
+                                    <dt>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-success">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                        </svg>
+                                    </dt>
+                                    <dd>Approved</dd>
+                                    {{ else }}
+                                    <dt>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-warning">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+                                        </svg>
+                                    </dt>
+                                    <dd>Pending</dd>
+                                    {{ end }}
+                                </div>
+                            </li>
+                            {{ end }}
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-span-2">
-        <h3 class="text-2xl font-bold h-3 mb-8">My Upcoming Leaves</h2>
-        <div class="overflow-y-auto">
-            <ul class="steps steps-vertical">
-                {{ range .UpcomingLeaves }}
-                <li data-content="{{ . | leaveTypeSign }}" class="step step-{{ . | leaveTypeColor }} grid-cols-1">
-                    <div class="inline-flex items-center ml-4 pl-4">
-                        <div>
-                            {{ .Type }} on {{ .Start | humanDate }} - {{ .End | humanDate }} ({{ .DurationDays }} days) 
-                        </div>
-                        {{ if .Approved }}
-                        <dt>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-success">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                            </svg>
-                        </dt>
-                        <dd>Approved</dd>
-                        {{ else }}
-                        <dt>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-warning">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
-                            </svg>
-                        </dt>
-                        <dd>Pending</dd>
-                        {{ end }}
-                    </div>
-                </li>
-                {{ end }}
-            </ul>
-        </div>  
-    </div>
-</div>
+</main>
 {{ end }}
