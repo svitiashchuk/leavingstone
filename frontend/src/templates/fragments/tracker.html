@@ -46,19 +46,20 @@
     </div>
 </div>
 
-<!-- End pagination block -->
-<div class="overflow-x-scroll">
-    <table class="table-auto table-xs table-pin-cols mb-8">
+<div class="overflow-x-auto w-full">
+    <table class="table table-xs table-pin-rows table-pin-cols mb-8">
         <thead>
-            <th>Employee</th>
-            {{ range .Days }}
-            <th>{{ .Format "02.01" }}</th>
-            {{ end }}
+            <tr>
+                <th>Employee</th>
+                {{ range .Days }}
+                <td>{{ .Format "02.01" }}</td>
+                {{ end }}
+            </tr>
         </thead>
         <tbody>
             {{ range $employee := .Employees }}
-            <tr>
-                <td class="min-w-fit whitespace-nowrap">{{ $employee.Name }}</td>
+            <tr class="hover">
+                <th class="min-w-fit whitespace-nowrap">{{ $employee.Name }}</th>
                 {{ range $day := $.Days }}
 
                 {{ $day := $employee.Calendar.Get $day }}
