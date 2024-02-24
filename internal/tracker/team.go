@@ -43,8 +43,16 @@ func (app *App) CreateTeam(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	data := struct {
+		*CommonFormTemplateData
+		*CommonTemplateData
+	}{
+		&CommonFormTemplateData{},
+		app.commonTemplateData(r),
+	}
+
 	tmpl := app.templator.Page("team_create", nil)
-	if err := tmpl.ExecuteTemplate(w, "layout", app.commonTemplateData(r)); err != nil {
+	if err := tmpl.ExecuteTemplate(w, "layout", data); err != nil {
 		app.internalError(w, err)
 		return
 	}
