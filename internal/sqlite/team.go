@@ -93,14 +93,14 @@ func (s *TeamService) AssignLead(teamID int, leadID int) error {
 	return nil
 }
 
-func (s *TeamService) AddMember(teamID int, memberID int) error {
-	query := "INSERT INTO team_members (team_id, member_id) VALUES (?, ?)"
-	_, err := s.db.Exec(query, teamID, memberID)
+func (s *TeamService) AddMember(teamID int, userID int) error {
+	query := "UPDATE users SET team_id = ? WHERE id = ?"
+	_, err := s.db.Exec(query, teamID, userID)
 	return err
 }
 
 func (s *TeamService) RemoveMember(teamID int, memberID int) error {
-	query := "DELETE FROM team_members WHERE team_id = ? AND member_id = ?"
-	_, err := s.db.Exec(query, teamID, memberID)
+	query := "UPDATE users SET team_id = NULL WHERE id = ?"
+	_, err := s.db.Exec(query, memberID)
 	return err
 }

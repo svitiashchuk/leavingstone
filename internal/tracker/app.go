@@ -134,6 +134,7 @@ func (app *App) RegisterRoutes() {
 	http.HandleFunc("/overview", mainMiddleware.Then(app.handleOverview))
 	http.HandleFunc("/teams/create", mainMiddleware.Then(app.CreateTeam))
 	http.HandleFunc("/teams/details", mainMiddleware.Then(app.TeamDetails))
+	http.HandleFunc("/teams/delete-member", mainMiddleware.Then(app.handleDeleteMember))
 
 	http.HandleFunc("/leaves/plan", mainMiddleware.Then(app.handlePlanLeave))
 	http.HandleFunc("/leaves/approve", mainMiddleware.Then(app.handleLeaveApprove))
@@ -144,6 +145,7 @@ func (app *App) RegisterRoutes() {
 	// fragments
 	http.HandleFunc("/tracker", mainMiddleware.Then(app.handleTracker))
 	http.HandleFunc("/fragments/calendar", mainMiddleware.Then(app.handleCalendar))
+	http.HandleFunc("/fragments/teams/delete-member-dialog", mainMiddleware.Then(app.handleDeleteMemberDialog))
 }
 
 func (app *App) handleIndex(w http.ResponseWriter, r *http.Request) {
