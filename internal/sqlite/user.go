@@ -177,7 +177,7 @@ func (us *UserService) SearchEmployees(q string, teamID int) ([]*model.User, err
 
 	if q == "" {
 		rows, err = us.db.Query(`
-			SELECT id, name, email, token, start
+			SELECT id, name, email, team_id, token, start
 			FROM users
 			WHERE team_id <> ?
 		`, teamID)
@@ -185,7 +185,7 @@ func (us *UserService) SearchEmployees(q string, teamID int) ([]*model.User, err
 		searchTerm := "%" + q + "%"
 
 		rows, err = us.db.Query(`
-			SELECT id, name, email, token, start
+			SELECT id, name, email, team_id, token, start
 			FROM users
 			WHERE team_id <> ? AND (name LIKE ? OR email LIKE ?)
 		`, teamID, searchTerm, searchTerm)
@@ -199,7 +199,7 @@ func (us *UserService) SearchEmployees(q string, teamID int) ([]*model.User, err
 	users := []*model.User{}
 	for rows.Next() {
 		user := &model.User{}
-		err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.Token, &user.Started)
+		err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.TeamID, &user.Token, &user.Started)
 		if err != nil {
 			return nil, err
 		}

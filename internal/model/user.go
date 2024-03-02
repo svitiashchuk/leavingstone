@@ -10,6 +10,7 @@ type User struct {
 	Password      string
 	Leaves        []*Leave
 	Started       time.Time
+	TeamID        int
 	ExtraVacation int
 }
 

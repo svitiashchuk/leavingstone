@@ -115,7 +115,8 @@
 <dialog id="search_members_modal" class="modal">
   <div class="modal-box w-11/12 h-5/6 max-w-5xl flex flex-col">
     <form method="dialog">
-        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+        <!-- TODO: trigger proper events on closing modal -->
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onclick="window.location.reload()">✕</button>
     </form>
 
     <div class="text-xl font-semibold inline-block">
@@ -129,7 +130,7 @@
                             value=""
                             name="q"
                             hx-get="/fragments/teams/search-members?team_id={{ .Team.ID }}" 
-                            hx-trigger="input changed delay:500ms, search" 
+                            hx-trigger="input changed delay:500ms, search, reloadSearchResults from:body" 
                             hx-target="#team_search_members_results_table" 
                             hx-indicator="#loader">
                     </div>
@@ -138,7 +139,7 @@
         </div>
     </div>
     <div class="divider mt-2"></div>
-    <!-- TODO Put loader inside div together with table container and overlay table on requests -->
+    <!-- TODO: Put loader inside div together with table container and overlay table on requests -->
     <div id="loader" role="status" class="hidden absolute -translate-x-1/2 -translate-y-1/2 top-2/4 left-1/2">
         <span class="loading loading-lg loading-spinner text-secondary"></span>
         <span class="sr-only">Loading...</span>
@@ -149,7 +150,8 @@
     <div class="modal-action flex-none ">
       <form method="dialog">
         <!-- if there is a button, it will close the modal -->
-        <button class="btn">Close</button>
+        <!-- TODO: trigger proper events on closing modal -->
+        <button class="btn" onclick="window.location.reload()">Close</button>
       </form>
     </div>
   </div>

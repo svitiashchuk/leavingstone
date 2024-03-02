@@ -134,6 +134,7 @@ func (app *App) RegisterRoutes() {
 	http.HandleFunc("/overview", mainMiddleware.Then(app.handleOverview))
 	http.HandleFunc("/teams/create", mainMiddleware.Then(app.CreateTeam))
 	http.HandleFunc("/teams/details", mainMiddleware.Then(app.TeamDetails))
+	http.HandleFunc("/teams/add-member", mainMiddleware.Then(app.handleAddMember))
 	http.HandleFunc("/teams/delete-member", mainMiddleware.Then(app.handleDeleteMember))
 
 	http.HandleFunc("/leaves/plan", mainMiddleware.Then(app.handlePlanLeave))

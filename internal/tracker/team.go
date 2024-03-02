@@ -22,7 +22,8 @@ type DeleteMemberDialogTemplateData struct {
 }
 
 type SearchEmployeesTemplateData struct {
-	Employees []*model.User
+	Employees    []*model.User
+	TargetTeamID int
 }
 
 func (app *App) TeamsHierarchy(w http.ResponseWriter, r *http.Request) {
@@ -167,9 +168,41 @@ func (app *App) handleSearchMembers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	data := SearchEmployeesTemplateData{
+		Employees:    employees,
+		TargetTeamID: teamID,
+	}
 	tmpl := app.templator.Fragment("team_search_members", templ.Funcs())
-	if err := tmpl.ExecuteTemplate(w, "team_search_members.html", SearchEmployeesTemplateData{employees}); err != nil {
+	if err := tmpl.ExecuteTemplate(w, "team_search_members.html", data); err != nil {
 		app.internalError(w, err)
 		return
 	}
+}
+
+func (app *App) handleAddMember(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		app.internalError(w, fmt.Errorf("invalid method"))
+		return
+	}
+
+	teamID, err := strconv.Atoi(r.URL.Query().Get("team_id"))
+	if err != nil {
+		app.internalError(w, err)
+		return
+	}
+
+	userID, err := strconv.Atoi(r.URL.Query().Get("user_id"))
+	if err != nil {
+		app.internalError(w, err)
+		return
+	}
+
+	err = app.teamService.AddMember(teamID, userID)
+	if err != nil {
+		app.internalError(w, err)
+		return
+	}
+
+	w.Header().Add("HX-Trigger", "reloadSearchResults")
+	w.Write([]byte(""))
 }
