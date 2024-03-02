@@ -2,316 +2,39 @@
     <thead>
         <tr>
             <th>Name</th>
-            <th>Email Id</th>
-            <th>Location</th>
-            <th>Amount</th>
-            <th>Transaction Date</th>
+            <th>Email</th>
+            <th>Current Team</th>
+            <th>Started</th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
+        {{ range .Employees }}
         <tr>
             <td>
                 <div class="flex items-center space-x-3">
                     <div class="avatar">
-                        <div class="mask mask-circle w-12 h-12"><img src="https://reqres.in/img/faces/1-image.jpg" alt="Avatar"></div>
+                        <div class="mask mask-squircle w-12 h-12"><img src="https://reqres.in/img/faces/7-image.jpg" alt="Avatar"></div>
                     </div>
                     <div>
-                        <div class="font-bold">Alex</div>
+                        <div class="font-bold">{{ .Name | firstName }}</div>
+                        <div class="text-sm opacity-50">{{ .Name | lastName }}</div>
                     </div>
                 </div>
             </td>
-            <td>alex@dashwind.com</td>
-            <td>Paris</td>
-            <td>$100</td>
-            <td>2 Mar</td>
-        </tr>
-        <tr>
+            <td>{{ .Email }}</td>
             <td>
-                <div class="flex items-center space-x-3">
-                    <div class="avatar">
-                        <div class="mask mask-circle w-12 h-12"><img src="https://reqres.in/img/faces/2-image.jpg" alt="Avatar"></div>
-                    </div>
-                    <div>
-                        <div class="font-bold">Ereena</div>
-                    </div>
-                </div>
+                <div class="badge">Not assigned</div>
             </td>
-            <td>ereena@dashwind.com</td>
-            <td>London</td>
-            <td>$190</td>
-            <td>1 Mar</td>
-        </tr>
-        <tr>
+            <td>{{ .Started | humanDate }}</td>
             <td>
-                <div class="flex items-center space-x-3">
-                    <div class="avatar">
-                        <div class="mask mask-circle w-12 h-12"><img src="https://reqres.in/img/faces/3-image.jpg" alt="Avatar"></div>
-                    </div>
-                    <div>
-                        <div class="font-bold">John</div>
-                    </div>
-                </div>
+                <button class="btn btn-square btn-ghost">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
+                    </svg>                      
+                </button>
             </td>
-            <td>jhon@dashwind.com</td>
-            <td>Canada</td>
-            <td>$112</td>
-            <td>1 Mar</td>
         </tr>
-        <tr>
-            <td>
-                <div class="flex items-center space-x-3">
-                    <div class="avatar">
-                        <div class="mask mask-circle w-12 h-12"><img src="https://reqres.in/img/faces/4-image.jpg" alt="Avatar"></div>
-                    </div>
-                    <div>
-                        <div class="font-bold">Matrix</div>
-                    </div>
-                </div>
-            </td>
-            <td>matrix@dashwind.com</td>
-            <td>Peru</td>
-            <td>$111</td>
-            <td>1 Mar</td>
-        </tr>
-        <tr>
-            <td>
-                <div class="flex items-center space-x-3">
-                    <div class="avatar">
-                        <div class="mask mask-circle w-12 h-12"><img src="https://reqres.in/img/faces/5-image.jpg" alt="Avatar"></div>
-                    </div>
-                    <div>
-                        <div class="font-bold">Virat</div>
-                    </div>
-                </div>
-            </td>
-            <td>virat@dashwind.com</td>
-            <td>London</td>
-            <td>$190</td>
-            <td>29 Feb</td>
-        </tr>
-        <tr>
-            <td>
-                <div class="flex items-center space-x-3">
-                    <div class="avatar">
-                        <div class="mask mask-circle w-12 h-12"><img src="https://reqres.in/img/faces/6-image.jpg" alt="Avatar"></div>
-                    </div>
-                    <div>
-                        <div class="font-bold">Miya</div>
-                    </div>
-                </div>
-            </td>
-            <td>miya@dashwind.com</td>
-            <td>Paris</td>
-            <td>$230</td>
-            <td>29 Feb</td>
-        </tr>
-        <tr>
-            <td>
-                <div class="flex items-center space-x-3">
-                    <div class="avatar">
-                        <div class="mask mask-circle w-12 h-12"><img src="https://reqres.in/img/faces/3-image.jpg" alt="Avatar"></div>
-                    </div>
-                    <div>
-                        <div class="font-bold">Virat</div>
-                    </div>
-                </div>
-            </td>
-            <td>virat@dashwind.com</td>
-            <td>Canada</td>
-            <td>$331</td>
-            <td>29 Feb</td>
-        </tr>
-        <tr>
-            <td>
-                <div class="flex items-center space-x-3">
-                    <div class="avatar">
-                        <div class="mask mask-circle w-12 h-12"><img src="https://reqres.in/img/faces/1-image.jpg" alt="Avatar"></div>
-                    </div>
-                    <div>
-                        <div class="font-bold">Matrix</div>
-                    </div>
-                </div>
-            </td>
-            <td>matrix@dashwind.com</td>
-            <td>London</td>
-            <td>$581</td>
-            <td>29 Feb</td>
-        </tr>
-        <tr>
-            <td>
-                <div class="flex items-center space-x-3">
-                    <div class="avatar">
-                        <div class="mask mask-circle w-12 h-12"><img src="https://reqres.in/img/faces/3-image.jpg" alt="Avatar"></div>
-                    </div>
-                    <div>
-                        <div class="font-bold">Ereena</div>
-                    </div>
-                </div>
-            </td>
-            <td>ereena@dashwind.com</td>
-            <td>Tokyo</td>
-            <td>$151</td>
-            <td>29 Feb</td>
-        </tr>
-        <tr>
-            <td>
-                <div class="flex items-center space-x-3">
-                    <div class="avatar">
-                        <div class="mask mask-circle w-12 h-12"><img src="https://reqres.in/img/faces/2-image.jpg" alt="Avatar"></div>
-                    </div>
-                    <div>
-                        <div class="font-bold">John</div>
-                    </div>
-                </div>
-            </td>
-            <td>jhon@dashwind.com</td>
-            <td>Paris</td>
-            <td>$91</td>
-            <td>29 Feb</td>
-        </tr>
-        <tr>
-            <td>
-                <div class="flex items-center space-x-3">
-                    <div class="avatar">
-                        <div class="mask mask-circle w-12 h-12"><img src="https://reqres.in/img/faces/3-image.jpg" alt="Avatar"></div>
-                    </div>
-                    <div>
-                        <div class="font-bold">Virat</div>
-                    </div>
-                </div>
-            </td>
-            <td>virat@dashwind.com</td>
-            <td>Canada</td>
-            <td>$161</td>
-            <td>28 Feb</td>
-        </tr>
-        <tr>
-            <td>
-                <div class="flex items-center space-x-3">
-                    <div class="avatar">
-                        <div class="mask mask-circle w-12 h-12"><img src="https://reqres.in/img/faces/4-image.jpg" alt="Avatar"></div>
-                    </div>
-                    <div>
-                        <div class="font-bold">Matrix</div>
-                    </div>
-                </div>
-            </td>
-            <td>matrix@dashwind.com</td>
-            <td>US</td>
-            <td>$121</td>
-            <td>28 Feb</td>
-        </tr>
-        <tr>
-            <td>
-                <div class="flex items-center space-x-3">
-                    <div class="avatar">
-                        <div class="mask mask-circle w-12 h-12"><img src="https://reqres.in/img/faces/6-image.jpg" alt="Avatar"></div>
-                    </div>
-                    <div>
-                        <div class="font-bold">Ereena</div>
-                    </div>
-                </div>
-            </td>
-            <td>jhon@dashwind.com</td>
-            <td>Tokyo</td>
-            <td>$713</td>
-            <td>28 Feb</td>
-        </tr>
-        <tr>
-            <td>
-                <div class="flex items-center space-x-3">
-                    <div class="avatar">
-                        <div class="mask mask-circle w-12 h-12"><img src="https://reqres.in/img/faces/2-image.jpg" alt="Avatar"></div>
-                    </div>
-                    <div>
-                        <div class="font-bold">John</div>
-                    </div>
-                </div>
-            </td>
-            <td>ereena@dashwind.com</td>
-            <td>London</td>
-            <td>$217</td>
-            <td>28 Feb</td>
-        </tr>
-        <tr>
-            <td>
-                <div class="flex items-center space-x-3">
-                    <div class="avatar">
-                        <div class="mask mask-circle w-12 h-12"><img src="https://reqres.in/img/faces/3-image.jpg" alt="Avatar"></div>
-                    </div>
-                    <div>
-                        <div class="font-bold">Virat</div>
-                    </div>
-                </div>
-            </td>
-            <td>virat@dashwind.com</td>
-            <td>Paris</td>
-            <td>$117</td>
-            <td>28 Feb</td>
-        </tr>
-        <tr>
-            <td>
-                <div class="flex items-center space-x-3">
-                    <div class="avatar">
-                        <div class="mask mask-circle w-12 h-12"><img src="https://reqres.in/img/faces/7-image.jpg" alt="Avatar"></div>
-                    </div>
-                    <div>
-                        <div class="font-bold">Miya</div>
-                    </div>
-                </div>
-            </td>
-            <td>jhon@dashwind.com</td>
-            <td>Canada</td>
-            <td>$612</td>
-            <td>28 Feb</td>
-        </tr>
-        <tr>
-            <td>
-                <div class="flex items-center space-x-3">
-                    <div class="avatar">
-                        <div class="mask mask-circle w-12 h-12"><img src="https://reqres.in/img/faces/3-image.jpg" alt="Avatar"></div>
-                    </div>
-                    <div>
-                        <div class="font-bold">Matrix</div>
-                    </div>
-                </div>
-            </td>
-            <td>matrix@dashwind.com</td>
-            <td>London</td>
-            <td>$631</td>
-            <td>28 Feb</td>
-        </tr>
-        <tr>
-            <td>
-                <div class="flex items-center space-x-3">
-                    <div class="avatar">
-                        <div class="mask mask-circle w-12 h-12"><img src="https://reqres.in/img/faces/2-image.jpg" alt="Avatar"></div>
-                    </div>
-                    <div>
-                        <div class="font-bold">Virat</div>
-                    </div>
-                </div>
-            </td>
-            <td>ereena@dashwind.com</td>
-            <td>Tokyo</td>
-            <td>$151</td>
-            <td>28 Feb</td>
-        </tr>
-        <tr>
-            <td>
-                <div class="flex items-center space-x-3">
-                    <div class="avatar">
-                        <div class="mask mask-circle w-12 h-12"><img src="https://reqres.in/img/faces/3-image.jpg" alt="Avatar"></div>
-                    </div>
-                    <div>
-                        <div class="font-bold">Ereena</div>
-                    </div>
-                </div>
-            </td>
-            <td>virat@dashwind.com</td>
-            <td>Paris</td>
-            <td>$617</td>
-            <td>28 Feb</td>
-        </tr>
+        {{ end }}
     </tbody>
 </table>

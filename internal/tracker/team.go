@@ -21,6 +21,10 @@ type DeleteMemberDialogTemplateData struct {
 	TeamID int
 }
 
+type SearchEmployeesTemplateData struct {
+	Employees []*model.User
+}
+
 func (app *App) TeamsHierarchy(w http.ResponseWriter, r *http.Request) {
 	teams, err := app.teamService.AllTeams()
 	if err != nil {
@@ -150,15 +154,21 @@ func (app *App) handleDeleteMember(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) handleSearchMembers(w http.ResponseWriter, r *http.Request) {
-	// query := r.URL.Query().Get("q")
-	// members, err := []int{1} // app.us.SearchMembers(query)
-	// if err != nil {
-	// 	app.internalError(w, err)
-	// 	return
-	// }
+	query := r.URL.Query().Get("q")
+	teamID, err := strconv.Atoi(r.URL.Query().Get("team_id"))
+	if err != nil {
+		app.internalError(w, err)
+		return
+	}
 
-	tmpl := app.templator.Fragment("team_search_members", nil)
-	if err := tmpl.ExecuteTemplate(w, "team_search_members.html", nil); err != nil {
+	employees, err := app.us.SearchEmployees(query, teamID)
+	if err != nil {
+		app.internalError(w, err)
+		return
+	}
+
+	tmpl := app.templator.Fragment("team_search_members", templ.Funcs())
+	if err := tmpl.ExecuteTemplate(w, "team_search_members.html", SearchEmployeesTemplateData{employees}); err != nil {
 		app.internalError(w, err)
 		return
 	}

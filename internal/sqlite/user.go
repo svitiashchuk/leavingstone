@@ -170,3 +170,42 @@ func (us *UserService) LeavesUsed(u *model.User, leaveTypes []string, periodStar
 
 	return used
 }
+
+func (us *UserService) SearchEmployees(q string, teamID int) ([]*model.User, error) {
+	var rows *sql.Rows
+	var err error
+
+	if q == "" {
+		rows, err = us.db.Query(`
+			SELECT id, name, email, token, start
+			FROM users
+			WHERE team_id <> ?
+		`, teamID)
+	} else {
+		searchTerm := "%" + q + "%"
+
+		rows, err = us.db.Query(`
+			SELECT id, name, email, token, start
+			FROM users
+			WHERE team_id <> ? AND (name LIKE ? OR email LIKE ?)
+		`, teamID, searchTerm, searchTerm)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	users := []*model.User{}
+	for rows.Next() {
+		user := &model.User{}
+		err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.Token, &user.Started)
+		if err != nil {
+			return nil, err
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
+}

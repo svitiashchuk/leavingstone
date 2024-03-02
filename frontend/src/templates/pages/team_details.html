@@ -44,7 +44,7 @@
                         <div class="inline-block float-right">
                             <button for="search_members_modal" class="btn px-6 btn-sm normal-case btn-primary"
                                 onclick="search_members_modal.showModal()"
-                                hx-get="/fragments/teams/search-members"
+                                hx-get="/fragments/teams/search-members?team_id={{ .Team.ID }}"
                                 hx-target="#team_search_members_results_table"
                                 hx-trigger="click"
                                 hx-indicator="#loader"
@@ -127,8 +127,8 @@
                         <input type="search" class="input input-sm input-bordered w-full max-w-xs"
                             placeholder="Search" 
                             value=""
-                            name="search"
-                            hx-get="/fragments/teams/search-members" 
+                            name="q"
+                            hx-get="/fragments/teams/search-members?team_id={{ .Team.ID }}" 
                             hx-trigger="input changed delay:500ms, search" 
                             hx-target="#team_search_members_results_table" 
                             hx-indicator="#loader">
