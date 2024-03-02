@@ -146,6 +146,8 @@ func (app *App) RegisterRoutes() {
 	http.HandleFunc("/tracker", mainMiddleware.Then(app.handleTracker))
 	http.HandleFunc("/fragments/calendar", mainMiddleware.Then(app.handleCalendar))
 	http.HandleFunc("/fragments/teams/delete-member-dialog", mainMiddleware.Then(app.handleDeleteMemberDialog))
+	http.HandleFunc("/fragments/teams/search-members", mainMiddleware.Then(app.handleSearchMembers))
+
 }
 
 func (app *App) handleIndex(w http.ResponseWriter, r *http.Request) {

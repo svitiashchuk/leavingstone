@@ -148,3 +148,18 @@ func (app *App) handleDeleteMember(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("HX-Refresh", "true")
 	w.Write([]byte(""))
 }
+
+func (app *App) handleSearchMembers(w http.ResponseWriter, r *http.Request) {
+	// query := r.URL.Query().Get("q")
+	// members, err := []int{1} // app.us.SearchMembers(query)
+	// if err != nil {
+	// 	app.internalError(w, err)
+	// 	return
+	// }
+
+	tmpl := app.templator.Fragment("team_search_members", nil)
+	if err := tmpl.ExecuteTemplate(w, "team_search_members.html", nil); err != nil {
+		app.internalError(w, err)
+		return
+	}
+}

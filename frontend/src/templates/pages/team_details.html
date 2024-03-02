@@ -38,8 +38,17 @@
         </div>
         <div class="col-span-3">
             <div class="card w-full h-full p-6 bg-base-100 shadow-xl mt-2">
-                <div class="text-xl font-semibold inline-block">Team Members<div class="inline-block float-right">
-                        <div class="inline-block float-right"><button class="btn px-6 btn-sm normal-case btn-primary">Add New</button></div>
+                <div class="text-xl font-semibold inline-block">
+                    Team Members
+                    <div class="inline-block float-right">
+                        <div class="inline-block float-right">
+                            <button for="search_members_modal" class="btn px-6 btn-sm normal-case btn-primary"
+                                onclick="search_members_modal.showModal()"
+                                hx-get="/fragments/teams/search-members"
+                                hx-target="#team_search_members_results_table"
+                                hx-trigger="click"
+                             >Add New</button>
+                        </div>
                     </div>
                 </div>
                 <div class="divider mt-2"></div>
@@ -101,4 +110,43 @@
 <dialog id="delete_member_dialog" class="modal">
 </dialog>
 
+
+<dialog id="search_members_modal" class="modal">
+  <div class="modal-box w-11/12 h-5/6 max-w-5xl flex flex-col">
+    <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+    </form>
+
+    <div class="text-xl font-semibold inline-block">
+        Employees
+        <div class="inline-block float-right">
+            <div class="inline-block float-right">
+                <div class="inline-block mr-4">
+                    <div class="input-group relative flex flex-wrap items-stretch w-full ">
+                        <input type="search" placeholder="Search" class="input input-sm input-bordered  w-full max-w-xs" value="">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="divider mt-2"></div>
+    <div class="flex overflow-x-auto overflow-y-auto" id="team_search_members_results_table">
+        <!-- results table -->
+    </div>
+
+    <!-- <h3 class="font-bold text-lg">Hello!</h3> -->
+    <!-- <main class="flex-1 overflow-y-auto md:pt-4 pt-4 px-6  bg-base-200">
+        <div class="card w-full p-6 bg-base-100 shadow-xl mt-2"> -->
+            
+        <!-- </div>
+        <div class="h-16"></div>
+    </main> -->
+    <div class="modal-action flex-none ">
+      <form method="dialog">
+        <!-- if there is a button, it will close the modal -->
+        <button class="btn">Close</button>
+      </form>
+    </div>
+  </div>
+</dialog>
 {{ end }}
