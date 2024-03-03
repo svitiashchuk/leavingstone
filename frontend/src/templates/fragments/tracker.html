@@ -81,45 +81,23 @@
                 {{ $dayTypeClass = "bg-base" }}
                 {{ end }}
 
-                <td class="{{ $dayTypeClass }} border border-zinc-700">
-                    {{ if not $day.IsApproved }}
-                    <details class="dropdown dropdown-left flex h-full cursor-pointer">
-                        <summary class="block flex-grow">&nbsp;</summary>
-                        <div class="shadow menu dropdown-content z-[100] card card-compact w-96 bg-primary rounded-box">
-                            <div class="card-body">
-                                <div class="card-actions justify-between">
-                                <h2 class="card-title">Leave approval</h2>
-                                    <button class="btn btn-square btn-ghost btn-sm" onclick="this.closest('.dropdown').removeAttribute('open');">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                                    </button>
-                                </div>
-                                <p class="prose text-primary-content">You can approve or reject requested leave.</p>
-                                <div class="card-actions justify-end">
-                                    <button class="btn btn-circle btn-outline border-2" hx-post="/leaves/approve"
-                                        hx-vals='{"id": {{ $day.LeaveID }}}'>
-                                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
-                                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
-                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                                stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5" />
-                                        </svg>
-                                    </button>
-                                    <button class="btn btn-circle btn-outline border-2" hx-post="/leaves/reject"
-                                        hx-vals='{"id": {{ $day.LeaveID }}}'>
-                                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
-                                            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
-                                            <path
-                                                d="m9.414 8 5.293-5.293a1 1 0 1 0-1.414-1.414L8 6.586 2.707 1.293a1 1 0 0 0-1.414 1.414L6.586 8l-5.293 5.293a1 1 0 1 0 1.414 1.414L8 9.414l5.293 5.293a1 1 0 0 0 1.414-1.414L9.414 8Z" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </details>
-                    {{ end }}
-                </td>
+
+                {{ if not $day.IsApproved }}
+                <td class="{{ $dayTypeClass }} border border-zinc-700 cursor-pointer" 
+                    onclick="leave_decision_dialog.showModal()"
+                    hx-get="/fragments/leaves/decision-dialog?leave_id={{ $day.LeaveID }}"
+                    hx-target="#leave_decision_dialog"
+                    hx-trigger="click"
+                ></td>
+                {{ else }}
+                <td class="{{ $dayTypeClass }} border border-zinc-700"></td>
+                {{ end }}
+
                 {{ end }}
             </tr>
             {{ end }}
         </tbody>
     </table>
 </div>
+<dialog id="leave_decision_dialog" class="modal">
+</dialog>

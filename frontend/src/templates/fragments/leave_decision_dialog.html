@@ -1,0 +1,25 @@
+<div class="modal-box bg-primary text-primary-content">
+    <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+    </form>
+    <h3 class="font-semibold text-2xl pb-6 text-center">Leave approval</h3>
+    <p class="text-primary-content">You can approve or reject requested leave.</p>
+    <div class="card-actions justify-end">
+        <button class="btn btn-outline btn-circle border-2" hx-post="/leaves/approve"
+            hx-vals='{"id": {{ .LeaveID }}}'>
+            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2" d="M1 5.917 5.724 10.5 15 1.5" />
+            </svg>
+        </button>
+        <button class="btn btn-outline btn-circle border-2" hx-post="/leaves/reject"
+            hx-vals='{"id": {{ .LeaveID }}}'>
+            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                <path
+                    d="m9.414 8 5.293-5.293a1 1 0 1 0-1.414-1.414L8 6.586 2.707 1.293a1 1 0 0 0-1.414 1.414L6.586 8l-5.293 5.293a1 1 0 1 0 1.414 1.414L8 9.414l5.293 5.293a1 1 0 0 0 1.414-1.414L9.414 8Z" />
+            </svg>
+        </button>
+    </div>
+</div>

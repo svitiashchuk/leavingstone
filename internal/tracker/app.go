@@ -149,6 +149,8 @@ func (app *App) RegisterRoutes() {
 	http.HandleFunc("/fragments/teams/delete-member-dialog", mainMiddleware.Then(app.handleDeleteMemberDialog))
 	http.HandleFunc("/fragments/teams/search-members", mainMiddleware.Then(app.handleSearchMembers))
 
+	http.HandleFunc("/fragments/leaves/decision-dialog", mainMiddleware.Then(app.handleLeaveDecisionDialog))
+
 }
 
 func (app *App) handleIndex(w http.ResponseWriter, r *http.Request) {
@@ -354,6 +356,20 @@ func (app *App) handleDist(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-type", "text/css")
 	}
 	w.Write(b)
+}
+
+func (app *App) handleLeaveDecisionDialog(w http.ResponseWriter, r *http.Request) {
+	leaveID, err := strconv.Atoi(r.URL.Query().Get("leave_id"))
+	if err != nil {
+		app.internalError(w, err)
+		return
+	}
+
+	tmpl := app.templator.Fragment("leave_decision_dialog", nil)
+	if err := tmpl.ExecuteTemplate(w, "leave_decision_dialog.html", struct{ LeaveID int }{LeaveID: leaveID}); err != nil {
+		app.internalError(w, err)
+		return
+	}
 }
 
 func (app *App) handleLeaveApprove(w http.ResponseWriter, r *http.Request) {
