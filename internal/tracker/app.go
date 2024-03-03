@@ -69,6 +69,7 @@ func (app *App) userID(r *http.Request) int {
 type CommonTemplateData struct {
 	IsAuthenticated bool
 	Alert           string
+	Theme           string
 }
 
 type CommonFormTemplateData struct {
@@ -151,6 +152,8 @@ func (app *App) RegisterRoutes() {
 
 	http.HandleFunc("/fragments/leaves/decision-dialog", mainMiddleware.Then(app.handleLeaveDecisionDialog))
 
+	// settings
+	http.HandleFunc("/user-settings/theme", mainMiddleware.Then(app.handleThemeChange))
 }
 
 func (app *App) handleIndex(w http.ResponseWriter, r *http.Request) {
@@ -449,6 +452,7 @@ func (app *App) handleCalendar(w http.ResponseWriter, r *http.Request) {
 
 func (app *App) commonTemplateData(r *http.Request) *CommonTemplateData {
 	var alert string
+	theme := "dark"
 
 	ctxVal := r.Context().Value(session.SessionContextKey)
 	if ctxVal != nil {
@@ -456,10 +460,13 @@ func (app *App) commonTemplateData(r *http.Request) *CommonTemplateData {
 		if session != nil {
 			alert = session.GetFlash()
 		}
+
+		theme = session.Get("theme")
 	}
 
 	return &CommonTemplateData{
 		IsAuthenticated: true,
 		Alert:           alert,
+		Theme:           theme,
 	}
 }
