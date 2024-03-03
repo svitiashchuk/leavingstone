@@ -10,7 +10,7 @@
             <button class="btn btn-primary w-36"
                 hx-delete="/teams/delete-member?team_id={{ .TeamID }}&user_id={{ .UserID }}"
                 hx-swap="none"
-                onclick="delete_member_dialog.close()">Yes</button>
+                onclick="this.closest('dialog').close()">Yes</button>
         </form>
     </div>
 </div>
